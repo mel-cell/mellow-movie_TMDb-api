@@ -104,25 +104,6 @@ const HomePage: React.FC = () => {
           </div>
         </section>
 
-        {/* Featured Movie Section */}
-        {popularMovies.length > 0 && (
-          <section className="mb-8">
-            <div className="relative h-80 bg-cover bg-center rounded-lg overflow-hidden" 
-                 style={{ backgroundImage: `url(${popularMovies[0].backdrop_path})` }}>
-              <div className="absolute inset-0 bg-black bg-opacity-60 flex items-end p-6">
-                <div className="text-white">
-                  <h3 className="text-xl font-bold mb-2">{popularMovies[0].title}</h3>
-                  <p className="text-sm mb-4 line-clamp-2">{popularMovies[0].overview}</p>
-                  <Button variant="secondary" size="sm">
-                    <Play className="mr-1 h-4 w-4" />
-                    Play
-                  </Button>
-                </div>
-              </div>
-            </div>
-          </section>
-        )}
-
         <TrendingSection title="Popular TV Shows" items={popularTV} />
       </div>
     </div>
