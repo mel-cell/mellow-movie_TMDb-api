@@ -1,22 +1,38 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '../ui/button';
-import { 
-  Home, 
-  Film, 
-  Tv, 
-  TrendingUp, 
-  Users, 
-  Search, 
-  User, 
-  Menu, 
-  X 
+import {
+  Home,
+  Film,
+  Tv,
+  TrendingUp,
+  Users,
+  Search,
+  User,
+  Menu,
+  X
 } from 'lucide-react';
 import { Sheet, SheetContent, SheetTrigger } from '../ui/sheet';
+import {
+  Command,
+  CommandDialog,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from '../ui/command';
+import { tmdbService } from '../../lib/api/TMDbServices';
+import type { Movie, TVShow } from '../../lib/api/TMDbServices';
 
 const Header: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false); // Placeholder; integrate with actual auth
+  const [openSearch, setOpenSearch] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [debouncedQuery, setDebouncedQuery] = useState('');
+  const [searchResults, setSearchResults] = useState<(Movie | TVShow)[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
 
   React.useEffect(() => {
     const handleScroll = () => {
@@ -25,6 +41,32 @@ const Header: React.FC = () => {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  React.useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedQuery(searchQuery);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
+  const handleSearch = async (query: string) => {
+    if (!query.trim()) {
+      setSearchResults([]);
+      return;
+    }
+    setIsSearching(true);
+    try {
+      const [movieResults, tvResults] = await Promise.all([
+        tmdbService.searchMovies(query),
+        tmdbService.searchTVShows(query)
+      ]);
+      setSearchResults([...movieResults.results.slice(0, 5), ...tvResults.results.slice(0, 5)]);
+    } catch (error) {
+      console.error('Error searching:', error);
+    } finally {
+      setIsSearching(false);
+    }
+  };
 
   return (
     <header className={`fixed top-0 left-0 w-full z-50 text-white py-4 px-6 transition-all duration-300 ${
@@ -35,23 +77,23 @@ const Header: React.FC = () => {
         
         {/* Desktop Nav - Right side */}
         <nav className="hidden md:flex items-center space-x-8">
-          <Link to="/" className="flex items-center space-x-1 hover:text-gray-300 transition-colors">
+          <Link to="/" className="flex items-center space-x-1 text-white hover:text-gray-300 transition-colors">
             <Home className="h-5 w-5" />
             <span>Home</span>
           </Link>
-          <Link to="/movie" className="flex items-center space-x-1 hover:text-gray-300 transition-colors">
+          <Link to="/movie" className="flex items-center space-x-1 text-white hover:text-gray-300 transition-colors">
             <Film className="h-5 w-5" />
             <span>Movies</span>
           </Link>
-          <Link to="/tv" className="flex items-center space-x-1 hover:text-gray-300 transition-colors">
+          <Link to="/tv" className="flex items-center space-x-1 text-white hover:text-gray-300 transition-colors">
             <Tv className="h-5 w-5" />
             <span>TV Shows</span>
           </Link>
-          <Link to="/trending" className="flex items-center space-x-1 hover:text-gray-300 transition-colors">
+          <Link to="/trending" className="flex items-center space-x-1 text-white hover:text-gray-300 transition-colors">
             <TrendingUp className="h-5 w-5" />
             <span>Trending</span>
           </Link>
-          <Link to="/actors" className="flex items-center space-x-1 hover:text-gray-300 transition-colors">
+          <Link to="/actors" className="flex items-center space-x-1 text-white hover:text-gray-300 transition-colors">
             <Users className="h-5 w-5" />
             <span>Actors</span>
           </Link>
@@ -59,7 +101,12 @@ const Header: React.FC = () => {
 
         {/* Right Side: Search, Auth, Profile */}
         <div className="flex items-center space-x-4">
-          <Button variant="ghost" size="icon" className="text-white hover:bg-white/20 rounded-full">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="text-white hover:bg-white/20 rounded-full"
+            onClick={() => setOpenSearch(true)}
+          >
             <Search className="h-5 w-5" />
           </Button>
           
@@ -129,6 +176,51 @@ const Header: React.FC = () => {
           </SheetContent>
         </Sheet>
       </div>
+
+      <CommandDialog open={openSearch} onOpenChange={setOpenSearch}>
+        <CommandInput
+          placeholder="Search movies, TV shows..."
+          value={searchQuery}
+          onValueChange={(value) => {
+            setSearchQuery(value);
+            handleSearch(value);
+          }}
+        />
+        <CommandList>
+          <CommandEmpty>No results found.</CommandEmpty>
+          {searchResults.length > 0 && (
+            <CommandGroup heading="Results">
+              {searchResults.map((item) => (
+                <CommandItem
+                  key={item.id}
+                  onSelect={() => {
+                    // Navigate to movie or tv page
+                    const type = 'title' in item ? 'movie' : 'tv';
+                    window.location.href = `/${type}/${item.id}`;
+                    setOpenSearch(false);
+                  }}
+                >
+                  <div className="flex items-center space-x-2">
+                    {item.poster_path && (
+                      <img
+                        src={item.poster_path}
+                        alt={('title' in item ? item.title : item.name) || ''}
+                        className="w-8 h-12 object-cover rounded"
+                      />
+                    )}
+                    <div>
+                      <p className="font-medium">{('title' in item ? item.title : item.name) || ''}</p>
+                      <p className="text-sm text-muted-foreground">
+                        {('title' in item ? 'Movie' : 'TV Show')} • {item.vote_average?.toFixed(1)} ⭐
+                      </p>
+                    </div>
+                  </div>
+                </CommandItem>
+              ))}
+            </CommandGroup>
+          )}
+        </CommandList>
+      </CommandDialog>
     </header>
   );
 };

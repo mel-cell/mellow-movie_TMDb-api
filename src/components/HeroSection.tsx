@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Button } from './ui/button';
 import { Dialog, DialogContent, DialogTrigger } from './ui/dialog';
 import { Play, Plus } from 'lucide-react';
@@ -11,57 +11,6 @@ interface HeroSectionProps {
 }
 
 const HeroSection: React.FC<HeroSectionProps> = ({ heroMovie, heroTrailer, heroCast }) => {
-  const [player, setPlayer] = useState<any>(null);
-
-  useEffect(() => {
-    // Load YouTube IFrame Player API
-    const tag = document.createElement('script');
-    tag.src = 'https://www.youtube.com/iframe_api';
-    const firstScriptTag = document.getElementsByTagName('script')[0];
-    firstScriptTag.parentNode?.insertBefore(tag, firstScriptTag);
-
-    (window as any).onYouTubeIframeAPIReady = () => {
-      if (heroTrailer) {
-        const ytPlayer = new (window as any).YT.Player('hero-video-player', {
-          videoId: heroTrailer.key,
-          playerVars: {
-            autoplay: 1,
-            mute: 1,
-            controls: 0,
-            loop: 1,
-            playlist: heroTrailer.key,
-            modestbranding: 1,
-            rel: 0,
-            playsinline: 1,
-          },
-          events: {
-            onReady: (event: any) => {
-              setPlayer(event.target);
-              event.target.playVideo();
-            },
-            onStateChange: (event: any) => {
-              if (event.data === (window as any).YT.PlayerState.ENDED) {
-                event.target.playVideo();
-              }
-              // Restart 2 seconds before end
-              const duration = event.target.getDuration();
-              const currentTime = event.target.getCurrentTime();
-              if (duration - currentTime <= 2 && duration - currentTime > 0) {
-                event.target.seekTo(0);
-              }
-            },
-          },
-        });
-        setPlayer(ytPlayer);
-      }
-    };
-
-    return () => {
-      if (player) {
-        player.destroy();
-      }
-    };
-  }, [heroTrailer]);
 
   if (!heroMovie) return null;
 
@@ -113,7 +62,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ heroMovie, heroTrailer, heroC
             </div>
           )}
           
-          <p className="text-lg mb-6 line-clamp-3 opacity-90">{heroMovie.overview}</p>
+          <p className="text-lg mb-6 line-clamp-2 opacity-90 max-w-2xl">{heroMovie.overview}</p>
           
           <div className="flex gap-4 items-center">
             <Dialog>
@@ -141,34 +90,8 @@ const HeroSection: React.FC<HeroSectionProps> = ({ heroMovie, heroTrailer, heroC
         </div>
       </div>
 
-      {/* Cast section at bottom */}
-      <div className="absolute bottom-0 left-0 right-0 p-8 bg-gradient-to-t from-black/90 via-transparent to-transparent">
-        <div className="flex items-center space-x-8 overflow-x-auto pb-4">
-          {heroCast.slice(0, 6).map((cast) => (
-            <div key={cast.id} className="text-center min-w-[100px] flex-shrink-0">
-              {cast.profile_path && (
-                <img
-                  src={cast.profile_path}
-                  alt={cast.name}
-                  className="w-20 h-20 rounded-full mx-auto mb-2 object-cover border-2 border-white/50 hover:border-white transition-colors"
-                />
-              )}
-              <p className="text-sm text-white font-medium line-clamp-1">{cast.name}</p>
-              <p className="text-xs text-gray-400 line-clamp-1">{cast.character}</p>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <style jsx>{`
-        @keyframes fade-in {
-          from { opacity: 0; transform: translateY(20px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-        .animate-fade-in {
-          animation: fade-in 0.8s ease-out;
-        }
-      `}</style>
+      {/* gradient transisi transparant*/}
+      <div className="absolute bottom-0 left-0 right-0 p-8 h-[20%] bg-gradient-to-b from-transparent via-black/80 to-black"></div>
     </section>
   );
 };

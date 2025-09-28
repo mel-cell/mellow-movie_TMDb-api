@@ -2,8 +2,9 @@
 
 const TMDB_API_KEY = import.meta.env.VITE_TMDB_API_KEY;
 
+// Pastikan IMAGE_BASE_URL memiliki garis miring di akhir untuk konsistensi
 const TMDB_BASE_URL = 'https://api.themoviedb.org/3';
-const IMAGE_BASE_URL = 'https://image.tmdb.org/t/p';
+const IMAGE_BASE_URL = 'https://image.tmdb.org/t/p'; // Tanpa '/' di akhir
 
 // Types for TMDb responses (simplified)
 export interface Movie {
@@ -17,6 +18,11 @@ export interface Movie {
   genre_ids: number[];
 }
 
+export interface Genre {
+  id: number;
+  name: string;
+}
+
 export interface TVShow {
   id: number;
   name: string;
@@ -26,13 +32,6 @@ export interface TVShow {
   first_air_date: string;
   vote_average: number;
   genre_ids: number[];
-}
-
-export interface Person {
-  id: number;
-  name: string;
-  profile_path: string | null;
-  known_for_department: string;
 }
 
 export interface Video {
@@ -84,166 +83,126 @@ class TMDbService {
     }
     return response.json();
   }
+  
+  // Perbaikan: Fungsi Helper untuk memetakan path gambar menjadi URL lengkap
+  private mapImagePaths(results: any[]): any[] {
+    const IMAGE_SIZE_POSTER = 'w500';
+    const IMAGE_SIZE_BACKDROP = 'original';
+    const IMAGE_SIZE_PROFILE = 'w500'; // Untuk aktor
 
-  // Trending
-  async getTrending(mediaType: 'movie' | 'tv' | 'person', timeWindow: 'day' | 'week' = 'day') {
-    const data = await this.request(`/trending/${mediaType}/${timeWindow}`);
-    data.results = data.results.map((item: any) => {
-      if (item.poster_path) item.poster_path = `${IMAGE_BASE_URL}w500${item.poster_path}`;
-      if (item.backdrop_path) item.backdrop_path = `${IMAGE_BASE_URL}original${item.backdrop_path}`;
-      if (item.profile_path) item.profile_path = `${IMAGE_BASE_URL}w500${item.profile_path}`;
-      return item;
+    return results.map(item => {
+        // Gabungkan Base URL, Ukuran, dan Path. Tambahkan '/' setelah IMAGE_BASE_URL
+        if (item.poster_path) item.poster_path = `${IMAGE_BASE_URL}/${IMAGE_SIZE_POSTER}${item.poster_path}`;
+        if (item.backdrop_path) item.backdrop_path = `${IMAGE_BASE_URL}/${IMAGE_SIZE_BACKDROP}${item.backdrop_path}`;
+        if (item.profile_path) item.profile_path = `${IMAGE_BASE_URL}/${IMAGE_SIZE_PROFILE}${item.profile_path}`;
+        return item;
     });
+  }
+
+  // =================================================================
+  // FUNCTIONS DENGAN LOGIKA PEMETAAN YANG SUDAH DI-REFACTOR
+  // =================================================================
+  
+  // Trending
+  async getTrending(mediaType: 'movie' | 'tv' | 'person', timeWindow: 'day' | 'week' = 'day'): Promise<SearchResult<Movie | TVShow>> {
+    const data = await this.request(`/trending/${mediaType}/${timeWindow}`);
+    data.results = this.mapImagePaths(data.results);
     return data;
   }
 
   // Popular
-  async getPopularMovies(page: number = 1) {
+  async getPopularMovies(page: number = 1): Promise<SearchResult<Movie>> {
     const data = await this.request('/movie/popular', { page });
-    data.results = data.results.map((item: any) => {
-      if (item.poster_path) item.poster_path = `${IMAGE_BASE_URL}w500${item.poster_path}`;
-      if (item.backdrop_path) item.backdrop_path = `${IMAGE_BASE_URL}original${item.backdrop_path}`;
-      return item;
-    });
+    data.results = this.mapImagePaths(data.results);
     return data;
   }
 
-  async getPopularTVShows(page: number = 1) {
+  async getPopularTVShows(page: number = 1): Promise<SearchResult<TVShow>> {
     const data = await this.request('/tv/popular', { page });
-    data.results = data.results.map((item: any) => {
-      if (item.poster_path) item.poster_path = `${IMAGE_BASE_URL}w500${item.poster_path}`;
-      if (item.backdrop_path) item.backdrop_path = `${IMAGE_BASE_URL}original${item.backdrop_path}`;
-      return item;
-    });
+    data.results = this.mapImagePaths(data.results);
     return data;
   }
 
-  async getPopularPeople(page: number = 1) {
-    const data = await this.request('/person/popular', { page });
-    data.results = data.results.map((item: any) => {
-      if (item.profile_path) item.profile_path = `${IMAGE_BASE_URL}w500${item.profile_path}`;
-      return item;
-    });
+  // Genres
+  async getMovieGenres(): Promise<Genre[]> {
+    const data = await this.request('/genre/movie/list');
+    return data.genres;
+  }
+
+  // Discover by Genre
+  async getMoviesByGenre(genreId: number, page: number = 1): Promise<SearchResult<Movie>> {
+    const data = await this.request('/discover/movie', { with_genres: genreId, page });
+    data.results = this.mapImagePaths(data.results);
+    return data;
+  }
+
+  async getTVByGenre(genreId: number, page: number = 1): Promise<SearchResult<TVShow>> {
+    const data = await this.request('/discover/tv', { with_genres: genreId, page });
+    data.results = this.mapImagePaths(data.results);
+    return data;
+  }
+  
+  // Premieres / Now Playing
+  async getNowPlayingMovies(page: number = 1): Promise<SearchResult<Movie>> {
+    const data = await this.request('/movie/now_playing', { page });
+    data.results = this.mapImagePaths(data.results);
+    return data;
+  }
+
+  async getOnTheAirTV(page: number = 1): Promise<SearchResult<TVShow>> {
+    const data = await this.request('/tv/on_the_air', { page });
+    data.results = this.mapImagePaths(data.results);
+    return data;
+  }
+
+  // Movie details
+  async getMovieVideos(movieId: number): Promise<Video[]> {
+    const data = await this.request(`/movie/${movieId}/videos`);
+    return data.results.filter((video: Video) => video.site === 'YouTube');
+  }
+
+  async getMovieCredits(movieId: number): Promise<{ cast: Credit[] }> {
+    const data = await this.request(`/movie/${movieId}/credits`);
+    data.cast = this.mapImagePaths(data.cast);
     return data;
   }
 
   // Search
-  async searchMovies(query: string, page: number = 1) {
+  async searchMovies(query: string, page: number = 1): Promise<SearchResult<Movie>> {
     const data = await this.request('/search/movie', { query, page });
-    data.results = data.results.map((item: any) => {
-      if (item.poster_path) item.poster_path = `${IMAGE_BASE_URL}w500${item.poster_path}`;
-      if (item.backdrop_path) item.backdrop_path = `${IMAGE_BASE_URL}original${item.backdrop_path}`;
-      return item;
-    });
+    data.results = this.mapImagePaths(data.results);
     return data;
   }
 
-  async searchTVShows(query: string, page: number = 1) {
+  async searchTVShows(query: string, page: number = 1): Promise<SearchResult<TVShow>> {
     const data = await this.request('/search/tv', { query, page });
-    data.results = data.results.map((item: any) => {
-      if (item.poster_path) item.poster_path = `${IMAGE_BASE_URL}w500${item.poster_path}`;
-      if (item.backdrop_path) item.backdrop_path = `${IMAGE_BASE_URL}original${item.backdrop_path}`;
-      return item;
-    });
+    data.results = this.mapImagePaths(data.results);
     return data;
   }
 
-  async searchPeople(query: string, page: number = 1) {
-    const data = await this.request('/search/person', { query, page });
-    data.results = data.results.map((item: any) => {
-      if (item.profile_path) item.profile_path = `${IMAGE_BASE_URL}w500${item.profile_path}`;
-      return item;
-    });
+  // Discover with filters
+  async discoverMovies(params: {
+    genre?: number;
+    year?: number;
+    sort_by?: string;
+    vote_average_gte?: number;
+    page?: number;
+  } = {}): Promise<SearchResult<Movie>> {
+    const data = await this.request('/discover/movie', params);
+    data.results = this.mapImagePaths(data.results);
     return data;
   }
 
-  // Details
-  async getMovieDetails(id: number) {
-    const data = await this.request(`/movie/${id}`);
-    // Append image paths
-    if (data.poster_path) data.poster_path = `${IMAGE_BASE_URL}w500${data.poster_path}`;
-    if (data.backdrop_path) data.backdrop_path = `${IMAGE_BASE_URL}original${data.backdrop_path}`;
+  async discoverTV(params: {
+    genre?: number;
+    year?: number;
+    sort_by?: string;
+    vote_average_gte?: number;
+    page?: number;
+  } = {}): Promise<SearchResult<TVShow>> {
+    const data = await this.request('/discover/tv', params);
+    data.results = this.mapImagePaths(data.results);
     return data;
-  }
-
-  async getTVShowDetails(id: number) {
-    const data = await this.request(`/tv/${id}`);
-    if (data.poster_path) data.poster_path = `${IMAGE_BASE_URL}w500${data.poster_path}`;
-    if (data.backdrop_path) data.backdrop_path = `${IMAGE_BASE_URL}original${data.backdrop_path}`;
-    return data;
-  }
-
-  async getPersonDetails(id: number) {
-    const data = await this.request(`/person/${id}`);
-    if (data.profile_path) data.profile_path = `${IMAGE_BASE_URL}w500${data.profile_path}`;
-    return data;
-  }
-
-  // Credits
-  async getMovieCredits(id: number) {
-    const { cast, crew } = await this.request(`/movie/${id}/credits`);
-    // Enhance with images
-    cast.forEach((person: Credit) => {
-      if (person.profile_path) person.profile_path = `${IMAGE_BASE_URL}w200${person.profile_path}`;
-    });
-    return { cast, crew };
-  }
-
-  async getTVShowCredits(id: number) {
-    const { cast, crew } = await this.request(`/tv/${id}/credits`);
-    cast.forEach((person: Credit) => {
-      if (person.profile_path) person.profile_path = `${IMAGE_BASE_URL}w200${person.profile_path}`;
-    });
-    return { cast, crew };
-  }
-
-  async getPersonCredits(id: number) {
-    return this.request(`/person/${id}/movie_credits`);
-  }
-
-  // Videos
-  async getMovieVideos(id: number) {
-    const { results } = await this.request(`/movie/${id}/videos`);
-    return results.filter((video: Video) => video.site === 'YouTube' && video.type === 'Trailer');
-  }
-
-  async getTVShowVideos(id: number) {
-    const { results } = await this.request(`/tv/${id}/videos`);
-    return results.filter((video: Video) => video.site === 'YouTube' && video.type === 'Trailer');
-  }
-
-  // Recommendations / Similar
-  async getMovieRecommendations(id: number, page: number = 1) {
-    return this.request(`/movie/${id}/recommendations`, { page });
-  }
-
-  async getTVShowRecommendations(id: number, page: number = 1) {
-    return this.request(`/tv/${id}/recommendations`, { page });
-  }
-
-  async getMovieSimilar(id: number, page: number = 1) {
-    return this.request(`/movie/${id}/similar`, { page });
-  }
-
-  async getTVShowSimilar(id: number, page: number = 1) {
-    return this.request(`/tv/${id}/similar`, { page });
-  }
-
-  // Watch Providers
-  async getMovieWatchProviders(id: number) {
-    return this.request(`/movie/${id}/watch/providers`);
-  }
-
-  async getTVShowWatchProviders(id: number) {
-    return this.request(`/tv/${id}/watch/providers`);
-  }
-
-  // Hero: Random trending movie trailer
-  async getRandomTrendingMovieTrailer() {
-    const trending = await this.getTrending('movie', 'day');
-    const randomMovie = trending.results[Math.floor(Math.random() * trending.results.length)] as Movie;
-    const videos = await this.getMovieVideos(randomMovie.id);
-    return { movie: randomMovie, trailer: videos[0] };
   }
 }
 
@@ -253,7 +212,11 @@ export const tmdbService = new TMDbService();
 // Also export functions for convenience
 export const getPopularMovies = () => tmdbService.getPopularMovies();
 export const getPopularTVShows = () => tmdbService.getPopularTVShows();
-export const searchMovies = (query: string) => tmdbService.searchMovies(query);
-export const searchTVShows = (query: string) => tmdbService.searchTVShows(query);
-export const getMovieDetails = (id: number) => tmdbService.getMovieDetails(id);
-export const getTVShowDetails = (id: number) => tmdbService.getTVShowDetails(id);
+export const getMovieGenres = () => tmdbService.getMovieGenres();
+export const getMoviesByGenre = (genreId: number) => tmdbService.getMoviesByGenre(genreId);
+export const getTVByGenre = (genreId: number) => tmdbService.getTVByGenre(genreId);
+export const getNowPlayingMovies = () => tmdbService.getNowPlayingMovies();
+export const getOnTheAirTV = () => tmdbService.getOnTheAirTV();
+export const getTrending = (mediaType: 'movie' | 'tv' | 'person', timeWindow: 'day' | 'week' = 'day') => tmdbService.getTrending(mediaType, timeWindow);
+export const discoverMovies = (params: any) => tmdbService.discoverMovies(params);
+export const discoverTV = (params: any) => tmdbService.discoverTV(params);
