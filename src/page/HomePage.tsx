@@ -5,6 +5,7 @@ import HeroSection from '@/components/HeroSection';
 import TrendingSection from '@/components/TrendingSection';
 import BrowseSection from '@/components/BrowseSection';
 import VideoPlayRecommended from '@/components/videoPlayrecomended';
+import ActorList from '@/components/actorlist';
 
 const HomePage: React.FC = () => {
   const [heroMovie, setHeroMovie] = useState<Movie | null>(null);
@@ -50,6 +51,10 @@ const HomePage: React.FC = () => {
 
       <div className='max-w-screen-2xl mx-auto p-5'>
         {heroMovie && <VideoPlayRecommended movieId={heroMovie.id} />}
+      </div>
+
+      <div className='max-w-screen-2xl mx-auto p-5'>
+        {heroMovie && <ActorList movieId={heroMovie.id} />}
       </div>
     </div>
   );
