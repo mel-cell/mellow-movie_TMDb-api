@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui/card';
+
 import { tmdbService } from '../../lib/api/TMDbServices';
 import { useAuth } from '../../contexts/AuthContext';
 import { Film, AlertCircle } from 'lucide-react';
@@ -61,7 +62,7 @@ const Login: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen w-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black flex items-center justify-center p-4">
       <Card className="w-full max-w-md bg-gray-800 border-gray-700">
         <CardHeader className="text-center">
           <div className="flex justify-center mb-4">

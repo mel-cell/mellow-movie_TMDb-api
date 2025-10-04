@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { tmdbService } from "@/lib/api/TMDbServices";
 import type { TVShow, SearchResult } from "@/lib/api/TMDbServices";
+import MediaCard from "@/components/MediaCard";
 
 const TvShowPage: React.FC = () => {
   const [tvShows, setTvShows] = useState<TVShow[]>([]);
@@ -38,38 +39,7 @@ const TvShowPage: React.FC = () => {
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6 max-w-7xl mx-auto">
           {tvShows.map((show) => (
-            <a
-              key={show.id}
-              href={`/tv/${show.id}`}
-              className="relative group overflow-hidden rounded-xl bg-zinc-900 shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300"
-            >
-              {show.poster_path ? (
-                <img
-                  src={`https://image.tmdb.org/t/p/w500${show.poster_path}`}
-                  alt={show.name}
-                  className="w-full h-auto object-cover group-hover:opacity-90"
-                />
-              ) : (
-                <div className="w-full h-64 flex items-center justify-center bg-gray-700">
-                  <span className="text-sm text-gray-400">No Image</span>
-                </div>
-              )}
-
-              {/* Info mirip Home */}
-              <div className="p-3 bg-zinc-950/70 backdrop-blur-sm">
-                <h2 className="text-base font-semibold truncate text-gray-100">
-                  {show.name}
-                </h2>
-                <p className="text-sm text-gray-400">
-                  {show.first_air_date
-                    ? new Date(show.first_air_date).getFullYear()
-                    : "N/A"}
-                </p>
-                <p className="text-yellow-400 text-sm font-medium">
-                  ⭐ {show.vote_average.toFixed(1)}
-                </p>
-              </div>
-            </a>
+            <MediaCard key={show.id} item={show} />
           ))}
         </div>
       )}

@@ -5,6 +5,7 @@ import {
   getMoviesByGenre,
 } from "../lib/api/TMDbServices";
 import type { Movie } from "../lib/api/TMDbServices";
+import MediaCard from "../components/MediaCard";
 
 const MoviePage: React.FC = () => {
   const [movies, setMovies] = useState<Movie[]>([]);
@@ -35,7 +36,7 @@ const MoviePage: React.FC = () => {
       try {
         let data;
         if (selectedGenre) {
-          data = await getMoviesByGenre(selectedGenre, page);
+          data = await getMoviesByGenre(selectedGenre);
         } else {
           data = await getPopularMovies(page);
         }
@@ -113,21 +114,7 @@ const MoviePage: React.FC = () => {
         {/* 🔹 GRID MOVIES */}
         <div className="grid gap-6 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
           {movies.map((movie) => (
-            <div
-              key={movie.id}
-              className="relative group rounded-xl overflow-hidden cursor-pointer hover:scale-105 transition-transform duration-300"
-            >
-              <img
-                src={movie.poster_path || ""}
-                alt={movie.title}
-                className="w-full h-full object-cover"
-              />
-              {/* Overlay info */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-3">
-                <h2 className="text-base font-semibold">{movie.title}</h2>
-                <p className="text-sm text-gray-300">⭐ {movie.vote_average}</p>
-              </div>
-            </div>
+            <MediaCard key={movie.id} item={movie} />
           ))}
         </div>
 
