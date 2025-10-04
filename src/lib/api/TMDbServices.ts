@@ -195,7 +195,6 @@ class TMDbService {
     return response.json();
   }
 
-  
   // Similar Movies
   async getSimilarMovies(
     movieId: number,
@@ -520,7 +519,9 @@ class TMDbService {
 export const tmdbService = new TMDbService();
 
 // Also export functions for convenience
-export const getPopularMovies = () => tmdbService.getPopularMovies();
+export const getPopularMovies = (page: number = 1) =>
+  tmdbService.getPopularMovies(page);
+
 export const getPopularTVShows = () => tmdbService.getPopularTVShows();
 export const getMovieGenres = () => tmdbService.getMovieGenres();
 export const getMoviesByGenre = (genreId: number) =>
@@ -538,4 +539,5 @@ export const discoverMovies = (params: any) =>
 export const discoverTV = (params: any) => tmdbService.discoverTV(params);
 export const getSimilarMovies = (movieId: number, page: number = 1) =>
   tmdbService.getSimilarMovies(movieId, page);
+
 
