@@ -56,7 +56,7 @@ const DetailPage: React.FC = () => {
       }
     };
 
-    fetchData();
+    fetchData(); 
   }, [type, id]);
 
   if (loading) {
