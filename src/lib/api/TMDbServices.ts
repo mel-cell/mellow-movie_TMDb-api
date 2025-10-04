@@ -112,6 +112,29 @@ export interface SearchResult<T> {
   total_results: number;
 }
 
+
+export interface DeleteRatingResult {
+  success: boolean;
+  status_code: number;
+  status_message: string;
+  
+}
+
+export interface Collection {
+  id: number;
+  name: string;
+  poster_path: string | null;
+  backdrop_path: string | null;
+}
+
+export interface MultiSearchResult {
+  page: number;
+  results: (Movie | TVShow | Credit)[];
+  total_pages: number;
+  total_results: number;
+}
+
+
 class TMDbService {
   private apiKey: string;
 
@@ -172,27 +195,18 @@ class TMDbService {
     return response.json();
   }
 
-  // =================================================================
-  // DELETE RATING (MOVIE / TV)
-  // =================================================================
-  async deleteMovieRating(
+  
+
+
+  // Similar Movies
+  async getSimilarMovies(
     movieId: number,
-    sessionId: string
-  ): Promise<DeleteRatingResult> {
-    const url = new URL(`${TMDB_BASE_URL}/movie/${movieId}/rating`);
-    url.searchParams.append("api_key", this.apiKey);
-    url.searchParams.append("session_id", sessionId);
-
-    const response = await fetch(url.toString(), { method: "DELETE" });
-
-    if (!response.ok) {
-      throw new Error(
-        `TMDb API error: ${response.status} ${response.statusText}`
-      );
-    }
-    return response.json();
+    page: number = 1
+  ): Promise<SearchResult<Movie>> {
+    const data = await this.request(`/movie/${movieId}/similar`, { page });
+    data.results = this.mapImagePaths(data.results);
+    return data;
   }
-
 
   //untuk delete rating film
   async deleteTVRating(
@@ -355,30 +369,32 @@ class TMDbService {
     return data;
   }
 
-  
-
-// Search All (multi: movie, tv, person)
-async searchAll(query: string, page: number = 1): Promise<MultiSearchResult> {
-  const data = await this.request('/search/multi', { query, page });
-  data.results = this.mapImagePaths(data.results);
-  return data;
-}
-
-// Search Collection (khusus koleksi film)
-async searchCollection(query: string, page: number = 1): Promise<SearchResult<Collection>> {
-  const data = await this.request('/search/collection', { query, page });
-  data.results = this.mapImagePaths(data.results);
-  return data;
-}
-
-
-    // Authentication: Request Token (Gunakan Mode User)
-  async createRequestToken(): Promise<{ success: boolean; expires_at: string; request_token: string }> {
-    const data = await this.request('/authentication/token/new');
+  // Search All (multi: movie, tv, person)
+  async searchAll(query: string, page: number = 1): Promise<MultiSearchResult> {
+    const data = await this.request("/search/multi", { query, page });
+    data.results = this.mapImagePaths(data.results);
     return data;
   }
 
+  // Search Collection (khusus koleksi film)
+  async searchCollection(
+    query: string,
+    page: number = 1
+  ): Promise<SearchResult<Collection>> {
+    const data = await this.request("/search/collection", { query, page });
+    data.results = this.mapImagePaths(data.results);
+    return data;
+  }
 
+  // Authentication: Request Token (Gunakan Mode User)
+  async createRequestToken(): Promise<{
+    success: boolean;
+    expires_at: string;
+    request_token: string;
+  }> {
+    const data = await this.request("/authentication/token/new");
+    return data;
+  }
 
   // Discover with filters
   async discoverMovies(
@@ -461,3 +477,6 @@ export const getTrending = (
 export const discoverMovies = (params: any) =>
   tmdbService.discoverMovies(params);
 export const discoverTV = (params: any) => tmdbService.discoverTV(params);
+export const getSimilarMovies = (movieId: number, page: number = 1) =>
+  tmdbService.getSimilarMovies(movieId, page);
+
