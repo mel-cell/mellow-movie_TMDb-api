@@ -394,6 +394,67 @@ class TMDbService {
     return data;
   }
 
+  // Authentication: Create Session with Login (username/password)
+  async createSessionWithLogin(
+    username: string,
+    password: string,
+    requestToken: string
+  ): Promise<{
+    success: boolean;
+    session_id: string;
+  }> {
+    return this.post("/authentication/token/validate_with_login", {
+      username,
+      password,
+      request_token: requestToken,
+    });
+  }
+
+  // Authentication: Create Session from approved request token
+  async createSession(requestToken: string): Promise<{
+    success: boolean;
+    session_id: string;
+  }> {
+    return this.post("/authentication/session/new", {
+      request_token: requestToken,
+    });
+  }
+
+  // Authentication: Delete Session (logout)
+  async deleteSession(sessionId: string): Promise<{
+    success: boolean;
+    status_message: string;
+  }> {
+    const url = new URL(`${TMDB_BASE_URL}/authentication/session`);
+    url.searchParams.append("api_key", this.apiKey);
+
+    const response = await fetch(url.toString(), {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json;charset=utf-8",
+      },
+      body: JSON.stringify({ session_id: sessionId }),
+    });
+
+    if (!response.ok) {
+      throw new Error(
+        `TMDb API error: ${response.status} ${response.statusText}`
+      );
+    }
+    return response.json();
+  }
+
+  // Get Account Details
+  async getAccountDetails(sessionId: string): Promise<{
+    id: number;
+    name: string;
+    username: string;
+    avatar: any;
+  }> {
+    const data = await this.request("/account", { session_id: sessionId });
+    return data;
+  }
+
   // Discover with filters
   async discoverMovies(
     params: {

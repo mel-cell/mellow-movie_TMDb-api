@@ -3,13 +3,8 @@ import { Link } from 'react-router-dom';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Slider } from '@/components/ui/slider';
-import { Badge } from '@/components/ui/badge';
-import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Search, Play, Plus } from 'lucide-react';
 import { tmdbService } from '@/lib/api/TMDbServices';
-import SearchBar from '@/components/SearchBar';
 import type { Movie, TVShow, Genre, SearchResult } from '@/lib/api/TMDbServices';
 
 interface BrowseSectionProps {}
@@ -100,11 +95,6 @@ const BrowseSection: React.FC<BrowseSectionProps> = () => {
     );
   };
 
-  const handleSearch = () => {
-    setSearchQuery(searchInput.trim());
-    setCurrentPage(1);
-  };
-
   const clearFilters = () => {
     setSelectedGenres([]);
     setYear(null);
@@ -120,14 +110,6 @@ const BrowseSection: React.FC<BrowseSectionProps> = () => {
   return (
     <div className="py-8 bg-black">
       <div className="max-w-screen-2xl mx-auto px-4">
-
-        {/* Search Bar */}
-        <SearchBar
-          searchQuery={searchInput}
-          setSearchQuery={setSearchInput}
-          onSearch={handleSearch}
-          isSearching={loading}
-        />
 
         {/* Category Tabs */}
         <Tabs value={category} onValueChange={(value) => setCategory(value as 'movie' | 'tv' | 'original')} className="mb-6">
