@@ -25,7 +25,7 @@ const Header: React.FC = () => {
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
-  };
+  }; 
 
   return (
     <header className="bg-gray-900 text-white p-4">
