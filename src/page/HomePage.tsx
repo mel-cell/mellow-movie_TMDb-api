@@ -4,6 +4,7 @@ import type { Movie, Video, Credit } from '@/lib/api/TMDbServices';
 import HeroSection from '@/components/HeroSection';
 import TrendingSection from '@/components/TrendingSection';
 import BrowseSection from '@/components/BrowseSection';
+import VideoPlayRecommended from '@/components/videoPlayrecomended';
 
 const HomePage: React.FC = () => {
   const [heroMovie, setHeroMovie] = useState<Movie | null>(null);
@@ -45,6 +46,10 @@ const HomePage: React.FC = () => {
 
       <div className="max-w-screen-2xl mx-auto p-5">
         <BrowseSection />
+      </div>
+
+      <div className='max-w-screen-2xl mx-auto p-5'>
+        {heroMovie && <VideoPlayRecommended movieId={heroMovie.id} />}
       </div>
     </div>
   );

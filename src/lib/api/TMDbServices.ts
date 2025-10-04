@@ -110,16 +110,7 @@ export interface SearchResult<T> {
   results: T[];
   total_pages: number;
   total_results: number;
-  
 }
-
-//tipe untuk Delete Rating Response
-export interface DeleteRatingResult {
-  success: boolean;
-  status_code: number;
-  status_message: string;
-}
-
 
 class TMDbService {
   private apiKey: string;
@@ -328,16 +319,6 @@ class TMDbService {
     return data;
   }
 
-  // Similar Movies
-  async getSimilarMovies(
-    movieId: number,
-    page: number = 1
-  ): Promise<SearchResult<Movie>> {
-    const data = await this.request(`/movie/${movieId}/similar`, { page });
-    data.results = this.mapImagePaths(data.results);
-    return data;
-  }
-
   // TV details
   async getTVDetails(tvId: number): Promise<TVDetail> {
     const data = await this.request(`/tv/${tvId}`);
@@ -373,6 +354,31 @@ class TMDbService {
     data.results = this.mapImagePaths(data.results);
     return data;
   }
+
+  
+
+// Search All (multi: movie, tv, person)
+async searchAll(query: string, page: number = 1): Promise<MultiSearchResult> {
+  const data = await this.request('/search/multi', { query, page });
+  data.results = this.mapImagePaths(data.results);
+  return data;
+}
+
+// Search Collection (khusus koleksi film)
+async searchCollection(query: string, page: number = 1): Promise<SearchResult<Collection>> {
+  const data = await this.request('/search/collection', { query, page });
+  data.results = this.mapImagePaths(data.results);
+  return data;
+}
+
+
+    // Authentication: Request Token (Gunakan Mode User)
+  async createRequestToken(): Promise<{ success: boolean; expires_at: string; request_token: string }> {
+    const data = await this.request('/authentication/token/new');
+    return data;
+  }
+
+
 
   // Discover with filters
   async discoverMovies(
@@ -455,21 +461,3 @@ export const getTrending = (
 export const discoverMovies = (params: any) =>
   tmdbService.discoverMovies(params);
 export const discoverTV = (params: any) => tmdbService.discoverTV(params);
-export const getSimilarMovies = (movieId: number, page: number = 1) =>
-  tmdbService.getSimilarMovies(movieId, page);
-export const addFavorite = (
-  accountId: string,
-  sessionId: string,
-  movieId: number,
-  favorite: boolean = true
-) => tmdbService.addFavorite(accountId, sessionId, movieId, favorite);
-export const getFavorites = (
-  accountId: string,
-  sessionId: string,
-  page: number = 1
-) => tmdbService.getFavorites(accountId, sessionId, page);
-export const deleteMovieRating = (movieId: number, sessionId: string) =>
-  tmdbService.deleteMovieRating(movieId, sessionId);
-export const deleteTVRating = (tvId: number, sessionId: string) =>
-  tmdbService.deleteTVRating(tvId, sessionId);
-
