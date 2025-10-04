@@ -42,7 +42,7 @@ class ActorList extends React.Component<ActorListProps, ActorListState> {
       } else {
         credits = await tmdbService.getMovieCredits(this.props.movieId);
       }
-      this.setState({ actors: credits.cast, loading: false });
+      this.setState({ actors: credits.cast.slice(0, 10), loading: false }); // Limit to 10 actors
     } catch (err) {
       this.setState({ error: 'Failed to load actors.', loading: false });
     }
@@ -52,42 +52,61 @@ class ActorList extends React.Component<ActorListProps, ActorListState> {
     const { actors, loading, error } = this.state;
 
     if (loading) {
-      return <div>Loading actors...</div>;
+      return (
+        <section className="py-8">
+          <div className="max-w-screen-2xl mx-auto px-4">
+            <h2 className="text-2xl font-semibold text-white mb-6">Cast</h2>
+            <div className="flex space-x-4 overflow-x-auto pb-4">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <div key={i} className="flex-shrink-0 w-32">
+                  <div className="w-32 h-48 bg-gray-700 rounded-lg animate-pulse mb-2"></div>
+                  <div className="h-4 bg-gray-700 rounded w-3/4 animate-pulse mb-1"></div>
+                  <div className="h-3 bg-gray-600 rounded w-1/2 animate-pulse"></div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      );
     }
 
-    if (error) {
-      return <div>{error}</div>;
-    }
-
-    if (actors.length === 0) {
-      return <div>No actors found.</div>;
+    if (error || actors.length === 0) {
+      return null; // Don't show anything if no actors
     }
 
     return (
-      <div className="actor-list overflow-x-auto whitespace-nowrap py-2">
-        {actors.map((actor) => (
-          <div
-            key={actor.id}
-            className="actor-card inline-block bg-gray text-white rounded shadow p-2 m-1 cursor-pointer hover:shadow-lg transition-shadow duration-300"
-            style={{ width: '200px' }}
-            title={`${actor.name} as ${actor.character}`}
-          >
-            {actor.profile_path ? (
-              <img
-                src={actor.profile_path}
-                alt={actor.name}
-                className="w-full h-auto object-cover rounded mb-2"
-              />
-            ) : (
-              <div className="w-full h-32 bg-gray-300 flex items-center justify-center rounded mb-2">
-                No Image
+      <section className="py-8 bg-black">
+        <div className="max-w-screen-2xl mx-auto px-4">
+          <h2 className="text-2xl font-semibold text-white mb-6">Cast</h2>
+          <div className="flex space-x-4 overflow-x-auto pb-4">
+            {actors.map((actor) => (
+              <div
+                key={actor.id}
+                className="flex-shrink-0 w-32 group cursor-pointer"
+                title={`${actor.name} as ${actor.character}`}
+              >
+                <div className="relative overflow-hidden rounded-lg mb-3 transition-transform duration-300 group-hover:scale-105">
+                  {actor.profile_path ? (
+                    <img
+                      src={`https://image.tmdb.org/t/p/w300${actor.profile_path}`}
+                      alt={actor.name}
+                      className="w-32 h-48 object-cover"
+                      loading="lazy"
+                    />
+                  ) : (
+                    <div className="w-32 h-48 bg-gray-700 flex items-center justify-center rounded-lg">
+                      <span className="text-gray-400 text-sm text-center px-2">No Image</span>
+                    </div>
+                  )}
+                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-300"></div>
+                </div>
+                <h3 className="text-white text-sm font-semibold truncate mb-1">{actor.name}</h3>
+                <p className="text-gray-400 text-xs truncate">{actor.character}</p>
               </div>
-            )}
-            <h3 className="text-sm font-semibold text-center truncate">{actor.name}</h3>
-            <p className="text-xs text-center truncate">{actor.character}</p>
+            ))}
           </div>
-        ))}
-      </div>
+        </div>
+      </section>
     );
   }
 }

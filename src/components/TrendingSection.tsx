@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Link } from 'react-router-dom';
 import { Button } from './ui/button';
 import type { Movie, TVShow, Genre } from '../lib/api/TMDbServices';
+<<<<<<< HEAD
 import {
   getMovieGenres,
   getMoviesByGenre,
@@ -12,6 +12,10 @@ import {
   getOnTheAirTV,
   getTVByGenre
 } from '../lib/api/TMDbServices';
+=======
+import { getMovieGenres, getMoviesByGenre, getPopularMovies, getPopularTVShows, getTrending, getNowPlayingMovies, getOnTheAirTV, getTVByGenre } from '../lib/api/TMDbServices';
+import MediaCard from './MediaCard';
+>>>>>>> melvin
 
 type MediaItem = Movie | TVShow;
 
@@ -100,6 +104,7 @@ const TrendingSection: React.FC = () => {
 
   if (loading) {
     return (
+<<<<<<< HEAD
       <section className="mb-8 py-8">
         <div className="border-b border-gray-800 pb-3 mb-6">
           <div className="flex items-center justify-between">
@@ -113,6 +118,34 @@ const TrendingSection: React.FC = () => {
               <div key={i} className="w-24 h-8 bg-gray-700 rounded-lg animate-pulse" />
             ))}
           </div>
+=======
+      <section className="mb-8 py-8 ">
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-2xl font-semibold text-white">Trends Now</h2>
+          <Button variant="ghost" className="text-gray-400 ">View All</Button>
+        </div>
+        {/* Top tabs skeleton */}
+        <div className="flex space-x-2 mb-4 overflow-x-auto pb-2">
+          {[...Array(3)].map((_, i) => (
+            <div key={i} className="h-10 w-28 bg-gray-700 rounded-full animate-pulse flex-shrink-0" />
+          ))}
+        </div>
+        {/* Genre tabs skeleton */}
+        <div className="flex space-x-2 mb-6 overflow-x-auto pb-2 w-67">
+          {[...Array(8)].map((_, i) => (
+            <div key={i} className="h-10 w-24 bg-gray-700 rounded-full animate-pulse flex-shrink-0" />
+          ))}
+        </div>
+        {/* Posters skeleton */}
+        <div className="flex space-x-8 overflow-x-auto pb-4">
+          {[...Array(10)].map((_, i) => (
+            <div key={i} className="flex-shrink-0 w-56">
+              <div className="h-72 bg-gray-700 rounded animate-pulse mb-3" />
+              <div className="h-5 bg-gray-700 rounded w-3/4 animate-pulse" />
+              <div className="h-4 bg-gray-600 rounded w-1/2 animate-pulse mt-2" />
+            </div>
+          ))}
+>>>>>>> melvin
         </div>
       </section>
     );
@@ -129,6 +162,7 @@ const TrendingSection: React.FC = () => {
           </Button>
         </div>
 
+<<<<<<< HEAD
         {/* Category Buttons */}
         <div className="flex items-center justify-center gap-4 mt-4">
           {categoryNames.map((name, index) => (
@@ -157,6 +191,19 @@ const TrendingSection: React.FC = () => {
                   ? 'bg-red-600 text-white'
                   : 'bg-black text-gray-400 hover:text-white border border-gray-700'
               }`}
+=======
+      {/* Category Tabs - Button style */}
+      <div className="flex justify-center space-x-4 mb-6">
+        {categoryNames.map((name, index) => (
+          <button
+            key={index}
+            className={`px-6 py-2 rounded-full font-semibold transition-all duration-300 cursor-pointer whitespace-nowrap ${
+              selectedCategory === index
+                ? 'bg-red-600 text-white shadow-lg transform scale-105'
+                : 'bg-gray-800 text-gray-300 hover:bg-gray-700 hover:text-white hover:scale-105'
+            }`}
+            onClick={() => handleCategoryChange(index)}
+>>>>>>> melvin
           >
             All
           </button>
@@ -177,6 +224,7 @@ const TrendingSection: React.FC = () => {
         </div>
       </div>
 
+<<<<<<< HEAD
       {/* Movies List */}
       <div className="flex overflow-x-auto space-x-8 pb-4">
         {items.map((item) => {
@@ -225,6 +273,42 @@ const TrendingSection: React.FC = () => {
             </Link>
           );
         })}
+=======
+      {/* Genre Tabs - Button style */}
+      <div className="flex space-x-3 mb-6 overflow-x-auto pb-2">
+        <button
+          className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 cursor-pointer whitespace-nowrap flex-shrink-0 ${
+            selectedGenreId === 0
+              ? 'bg-red-600 text-white shadow-lg transform scale-105'
+              : 'bg-gray-800 text-gray-300 hover:bg-gray-700 hover:text-white hover:scale-105'
+          }`}
+          onClick={() => handleGenreChange(0)}
+        >
+          All
+        </button>
+        {genres.map((genre) => (
+          <button
+            key={genre.id}
+            className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 cursor-pointer whitespace-nowrap flex-shrink-0 ${
+              selectedGenreId === genre.id
+                ? 'bg-red-600 text-white shadow-lg transform scale-105'
+                : 'bg-gray-800 text-gray-300 hover:bg-gray-700 hover:text-white hover:scale-105'
+            }`}
+            onClick={() => handleGenreChange(genre.id)}
+          >
+            {genre.name}
+          </button>
+        ))}
+      </div>
+
+      {/* Horizontal Scrollable Posters */}
+      <div className="flex overflow-x-auto space-x-8 pb-4">
+        {items.map((item, index) => (
+          <div key={item.id} className="flex-shrink-0 w-56">
+            <MediaCard item={item} rank={index + 1} />
+          </div>
+        ))}
+>>>>>>> melvin
       </div>
     </section>
   );
