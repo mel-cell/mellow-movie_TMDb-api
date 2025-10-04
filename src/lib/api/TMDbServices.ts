@@ -104,6 +104,32 @@ export interface SearchResult<T> {
   total_pages: number;
   total_results: number;
 }
+//multi search
+export interface MultiSearchResult {
+  page: number;
+  results: (Movie | TVShow | Person)[]; 
+  total_pages: number;
+  total_results: number;
+}
+
+export interface Person {
+  id: number;
+  name: string;
+  profile_path: string | null;
+  known_for_department: string;
+  popularity: number;
+}
+
+// Collection (untuk hasil search/collection)
+export interface Collection {
+  id: number;
+  name: string;
+  overview: string;
+  poster_path: string | null;
+  backdrop_path: string | null;
+}
+
+
 
 class TMDbService {
   private apiKey: string;
@@ -220,7 +246,7 @@ class TMDbService {
     data.cast = this.mapImagePaths(data.cast);
     return data;
   }
-
+  
   // TV details
   async getTVDetails(tvId: number): Promise<TVDetail> {
     const data = await this.request(`/tv/${tvId}`);
@@ -250,6 +276,31 @@ class TMDbService {
     data.results = this.mapImagePaths(data.results);
     return data;
   }
+
+  
+
+// Search All (multi: movie, tv, person)
+async searchAll(query: string, page: number = 1): Promise<MultiSearchResult> {
+  const data = await this.request('/search/multi', { query, page });
+  data.results = this.mapImagePaths(data.results);
+  return data;
+}
+
+// Search Collection (khusus koleksi film)
+async searchCollection(query: string, page: number = 1): Promise<SearchResult<Collection>> {
+  const data = await this.request('/search/collection', { query, page });
+  data.results = this.mapImagePaths(data.results);
+  return data;
+}
+
+
+    // Authentication: Request Token (Gunakan Mode User)
+  async createRequestToken(): Promise<{ success: boolean; expires_at: string; request_token: string }> {
+    const data = await this.request('/authentication/token/new');
+    return data;
+  }
+
+
 
   // Discover with filters
   async discoverMovies(params: {
@@ -291,3 +342,12 @@ export const getOnTheAirTV = () => tmdbService.getOnTheAirTV();
 export const getTrending = (mediaType: 'movie' | 'tv' | 'person', timeWindow: 'day' | 'week' = 'day') => tmdbService.getTrending(mediaType, timeWindow);
 export const discoverMovies = (params: any) => tmdbService.discoverMovies(params);
 export const discoverTV = (params: any) => tmdbService.discoverTV(params);
+  // Search All (multi: movie, tv, person)
+export const searchAll = (query: string, page: number = 1) => tmdbService.searchAll(query, page);
+
+  // Search Collection (khusus koleksi film)
+export const searchCollection = (query: string, page: number = 1) => tmdbService.searchCollection(query, page);
+
+  // Authentication: Request Token (Gunakan Mode User)
+export const createRequestToken = () => tmdbService.createRequestToken();
+
