@@ -44,7 +44,7 @@ const DetailPage: React.FC = () => {
             tmdbService.getTVCredits(itemId),
           ]);
         }
-
+  
         setDetails(detailsData);
         setVideos(videosData);
         setCredits(creditsData);
