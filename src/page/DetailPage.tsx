@@ -44,7 +44,7 @@ const DetailPage: React.FC = () => {
             tmdbService.getTVCredits(itemId),
           ]);
         }
-
+  
         setDetails(detailsData);
         setVideos(videosData);
         setCredits(creditsData);
@@ -56,7 +56,7 @@ const DetailPage: React.FC = () => {
       }
     };
 
-    fetchData();
+    fetchData(); 
   }, [type, id]);
 
   if (loading) {
