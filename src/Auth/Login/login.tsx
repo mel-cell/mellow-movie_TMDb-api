@@ -3,7 +3,6 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui/card';
-
 import { tmdbService } from '../../lib/api/TMDbServices';
 import { useAuth } from '../../contexts/AuthContext';
 import { Film, AlertCircle } from 'lucide-react';
