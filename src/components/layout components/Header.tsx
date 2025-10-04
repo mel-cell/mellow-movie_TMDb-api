@@ -23,10 +23,12 @@ import {
 } from "../ui/command";
 import { tmdbService } from "../../lib/api/TMDbServices";
 import type { Movie, TVShow } from "../../lib/api/TMDbServices";
+import { useAuth } from "../../contexts/AuthContext";
 
 const Header: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false);
-  const [isLoggedIn] = useState(false);
+  const { user, logout } = useAuth();
+  const isLoggedIn = !!user;
   const [openSearch, setOpenSearch] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<(Movie | TVShow)[]>([]);
@@ -128,7 +130,7 @@ const Header: React.FC = () => {
       >
         <div className="container mx-auto flex justify-between items-center">
           <Link to="/" className="text-3xl font-bold text-red-600">
-            Netflix
+            Mellow
           </Link>
 
           {/* Desktop Nav */}
@@ -187,16 +189,23 @@ const Header: React.FC = () => {
                     Login
                   </Button>
                 </Link>
-                <Link to="/signup">
+                <Link to="https://www.themoviedb.org/signup" target="_blank" rel="noopener noreferrer">
                   <Button className="bg-red-600 hover:bg-red-700 text-white">
                     Signup
                   </Button>
                 </Link>
               </div>
             ) : (
-              <Button variant="ghost" size="icon" className="text-white">
-                <User className="h-5 w-5" />
-              </Button>
+              <>
+                <span className="text-white font-semibold">{user?.username}</span>
+                <Button
+                  variant="outline"
+                  className="text-white"
+                  onClick={() => logout()}
+                >
+                  Logout
+                </Button>
+              </>
             )}
           </div>
 
