@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
-import { tmdbService, Movie, TVShow, Person } from '../lib/api/TMDbService';
+import { tmdbService, Movie, TVShow, Person } from '../lib/api/TMDbServices';
 
 const MainPage: React.FC = () => {
   const location = useLocation();
