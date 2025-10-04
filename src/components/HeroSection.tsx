@@ -2,10 +2,10 @@ import React from 'react';
 import { Button } from './ui/button';
 import { Dialog, DialogContent, DialogTrigger } from './ui/dialog';
 import { Play, Plus } from 'lucide-react';
-import type { Movie, Video, Credit } from '../lib/api/TMDbServices';
+import type { Movie, TVShow, Video, Credit } from '../lib/api/TMDbServices';
 
 interface HeroSectionProps {
-  heroMovie: Movie | null;
+  heroMovie: Movie | TVShow | null;
   heroTrailer: Video | null;
   heroCast: Credit[];
 }
@@ -14,7 +14,10 @@ const HeroSection: React.FC<HeroSectionProps> = ({ heroMovie, heroTrailer, heroC
 
   if (!heroMovie) return null;
 
-  const releaseYear = heroMovie.release_date ? new Date(heroMovie.release_date).getFullYear() : '';
+  const isMovie = 'title' in heroMovie;
+  const title = isMovie ? heroMovie.title : heroMovie.name;
+  const releaseDate = isMovie ? heroMovie.release_date : heroMovie.first_air_date;
+  const releaseYear = releaseDate ? new Date(releaseDate).getFullYear() : '';
   const rating = Math.round(heroMovie.vote_average * 10);
 
   return (
@@ -46,7 +49,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ heroMovie, heroTrailer, heroC
       {/* Main content - Left aligned */}
       <div className="relative flex items-center h-full pt-20 pl-12">
         <div className="text-left text-white max-w-4xl animate-fade-in">
-          <h1 className="text-6xl font-bold mb-4">{heroMovie.title}</h1>
+          <h1 className="text-6xl font-bold mb-4">{title}</h1>
           
           {/* Metadata */}
           {releaseYear && (

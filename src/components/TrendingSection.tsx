@@ -1,21 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Button } from './ui/button';
 import type { Movie, TVShow, Genre } from '../lib/api/TMDbServices';
-<<<<<<< HEAD
-import {
-  getMovieGenres,
-  getMoviesByGenre,
-  getPopularMovies,
-  getPopularTVShows,
-  getTrending,
-  getNowPlayingMovies,
-  getOnTheAirTV,
-  getTVByGenre
-} from '../lib/api/TMDbServices';
-=======
 import { getMovieGenres, getMoviesByGenre, getPopularMovies, getPopularTVShows, getTrending, getNowPlayingMovies, getOnTheAirTV, getTVByGenre } from '../lib/api/TMDbServices';
 import MediaCard from './MediaCard';
->>>>>>> melvin
 
 type MediaItem = Movie | TVShow;
 
@@ -104,21 +91,6 @@ const TrendingSection: React.FC = () => {
 
   if (loading) {
     return (
-<<<<<<< HEAD
-      <section className="mb-8 py-8">
-        <div className="border-b border-gray-800 pb-3 mb-6">
-          <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-white">Trends Now</h2>
-            <Button variant="ghost" className="text-gray-400 hover:text-white text-sm">
-              View All
-            </Button>
-          </div>
-          <div className="flex gap-4 mt-4 justify-center">
-            {[...Array(3)].map((_, i) => (
-              <div key={i} className="w-24 h-8 bg-gray-700 rounded-lg animate-pulse" />
-            ))}
-          </div>
-=======
       <section className="mb-8 py-8 ">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl font-semibold text-white">Trends Now</h2>
@@ -145,7 +117,6 @@ const TrendingSection: React.FC = () => {
               <div className="h-4 bg-gray-600 rounded w-1/2 animate-pulse mt-2" />
             </div>
           ))}
->>>>>>> melvin
         </div>
       </section>
     );
@@ -161,37 +132,8 @@ const TrendingSection: React.FC = () => {
             View All
           </Button>
         </div>
+      </div>
 
-<<<<<<< HEAD
-        {/* Category Buttons */}
-        <div className="flex items-center justify-center gap-4 mt-4">
-          {categoryNames.map((name, index) => (
-            <button
-              key={index}
-              onClick={() => handleCategoryChange(index)}
-              className={`relative text-sm px-4 py-2 rounded-lg font-medium transition-all
-                ${
-                  selectedCategory === index
-                    ? 'bg-black text-white after:absolute after:-bottom-3 after:left-1/2 after:-translate-x-1/2 after:w-1.5 after:h-1.5 after:bg-red-600 after:rounded-full'
-                    : 'bg-black text-gray-400 hover:text-white'
-                }`}
-            >
-              {name}
-            </button>
-          ))}
-        </div>
-
-        {/* Genre Buttons */}
-        <div className="flex items-center justify-center gap-3 mt-4 overflow-x-auto pb-2">
-          <button
-            onClick={() => handleGenreChange(0)}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all
-              ${
-                selectedGenreId === 0
-                  ? 'bg-red-600 text-white'
-                  : 'bg-black text-gray-400 hover:text-white border border-gray-700'
-              }`}
-=======
       {/* Category Tabs - Button style */}
       <div className="flex justify-center space-x-4 mb-6">
         {categoryNames.map((name, index) => (
@@ -203,77 +145,12 @@ const TrendingSection: React.FC = () => {
                 : 'bg-gray-800 text-gray-300 hover:bg-gray-700 hover:text-white hover:scale-105'
             }`}
             onClick={() => handleCategoryChange(index)}
->>>>>>> melvin
           >
-            All
+            {name}
           </button>
-          {genres.map((genre) => (
-            <button
-              key={genre.id}
-              onClick={() => handleGenreChange(genre.id)}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all
-                ${
-                  selectedGenreId === genre.id
-                    ? 'bg-red-600 text-white'
-                    : 'bg-black text-gray-400 hover:text-white border border-gray-700'
-                }`}
-            >
-              {genre.name}
-            </button>
-          ))}
-        </div>
+        ))}
       </div>
 
-<<<<<<< HEAD
-      {/* Movies List */}
-      <div className="flex overflow-x-auto space-x-8 pb-4">
-        {items.map((item) => {
-          const itemTitle = getItemTitle(item);
-          const imagePath = item.poster_path;
-          const voteAverage = 'vote_average' in item ? item.vote_average : 0;
-          const itemType = getItemType(item);
-
-          return (
-            <Link
-              key={item.id}
-              to={`/${itemType === 'Movie' ? 'movie' : 'tv'}/${item.id}`}
-              className="flex-shrink-0 w-56 group cursor-pointer"
-            >
-              <div className="relative overflow-hidden rounded-lg">
-                {imagePath ? (
-                  <img
-                    src={imagePath}
-                    alt={itemTitle}
-                    className="w-full h-72 object-cover transition-transform duration-300 group-hover:scale-105"
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).src = '/vite.svg';
-                      (e.target as HTMLImageElement).classList.add('opacity-50');
-                    }}
-                  />
-                ) : (
-                  <div className="w-full h-72 bg-gray-700 flex items-center justify-center rounded-lg">
-                    <span className="text-gray-500 text-sm">No Image</span>
-                  </div>
-                )}
-                <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 transition-all duration-300 flex items-end p-4">
-                  <div className="text-white text-base line-clamp-2 w-full">
-                    {itemTitle}
-                    <div className="text-gray-300 text-sm mt-1">{itemType}</div>
-                  </div>
-                </div>
-              </div>
-              <div className="mt-4">
-                <p className="text-white text-lg font-medium line-clamp-1 group-hover:text-gray-300 transition-colors">
-                  {itemTitle}
-                </p>
-                <p className="text-gray-400 text-base mt-2">
-                  {voteAverage ? `${Math.round(voteAverage * 10)}%` : 'N/A'}
-                </p>
-              </div>
-            </Link>
-          );
-        })}
-=======
       {/* Genre Tabs - Button style */}
       <div className="flex space-x-3 mb-6 overflow-x-auto pb-2">
         <button
@@ -308,7 +185,6 @@ const TrendingSection: React.FC = () => {
             <MediaCard item={item} rank={index + 1} />
           </div>
         ))}
->>>>>>> melvin
       </div>
     </section>
   );

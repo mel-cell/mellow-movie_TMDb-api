@@ -5,15 +5,11 @@ import MoviePage from './page/MoviePage';
 import TvShowPage from './page/TvShowPage';
 import DetailPage from './page/DetailPage';
 import ActorsPage from './page/ActorsPage';
-<<<<<<< HEAD
-import SettingPage from './page/SettingPage';
 import MainPage from './page/MainPage';
-=======
 import ProfilePage from './page/profilePage';
 import FavPage from './page/favPage';
 import Login from './Auth/Login/login';
 import PrivateRoute from './components/PrivateRoute';
->>>>>>> melvin
 
 function App() {
   return (
@@ -25,7 +21,7 @@ function App() {
           <Route path="movie/:id" element={<DetailPage />} />
           <Route path="tv" element={<TvShowPage />} />
           <Route path="tv/:id" element={<DetailPage />} />
-          <Route path="trending" element={<MainPage />} /> {/* Reuse Home for trending or create separate */}
+          <Route path="trending" element={<MainPage />} />
           <Route path="actors" element={<ActorsPage />} />
           <Route path="profile" element={<PrivateRoute><ProfilePage /></PrivateRoute>} />
           <Route path="favorites" element={<PrivateRoute><FavPage /></PrivateRoute>} />
