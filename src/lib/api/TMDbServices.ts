@@ -18,6 +18,27 @@ export interface Movie {
   genre_ids: number[];
 }
 
+export interface MovieDetail extends Movie {
+  adult: boolean;
+  belongs_to_collection: any;
+  budget: number;
+  genres: Genre[];
+  homepage: string;
+  imdb_id: string;
+  original_language: string;
+  original_title: string;
+  popularity: number;
+  production_companies: any[];
+  production_countries: any[];
+  revenue: number;
+  runtime: number;
+  spoken_languages: any[];
+  status: string;
+  tagline: string;
+  video: boolean;
+  vote_count: number;
+}
+
 export interface Genre {
   id: number;
   name: string;
@@ -32,6 +53,34 @@ export interface TVShow {
   first_air_date: string;
   vote_average: number;
   genre_ids: number[];
+}
+
+export interface TVDetail extends TVShow {
+  adult: boolean;
+  created_by: any[];
+  episode_run_time: number[];
+  genres: Genre[];
+  homepage: string;
+  in_production: boolean;
+  languages: string[];
+  last_air_date: string;
+  last_episode_to_air: any;
+  next_episode_to_air: any;
+  networks: any[];
+  number_of_episodes: number;
+  number_of_seasons: number;
+  origin_country: string[];
+  original_language: string;
+  original_name: string;
+  popularity: number;
+  production_companies: any[];
+  production_countries: any[];
+  seasons: any[];
+  spoken_languages: any[];
+  status: string;
+  tagline: string;
+  type: string;
+  vote_count: number;
 }
 
 export interface Video {
@@ -156,6 +205,11 @@ class TMDbService {
   }
 
   // Movie details
+  async getMovieDetails(movieId: number): Promise<MovieDetail> {
+    const data = await this.request(`/movie/${movieId}`);
+    return this.mapImagePaths([data])[0];
+  }
+
   async getMovieVideos(movieId: number): Promise<Video[]> {
     const data = await this.request(`/movie/${movieId}/videos`);
     return data.results.filter((video: Video) => video.site === 'YouTube');
@@ -163,6 +217,23 @@ class TMDbService {
 
   async getMovieCredits(movieId: number): Promise<{ cast: Credit[] }> {
     const data = await this.request(`/movie/${movieId}/credits`);
+    data.cast = this.mapImagePaths(data.cast);
+    return data;
+  }
+
+  // TV details
+  async getTVDetails(tvId: number): Promise<TVDetail> {
+    const data = await this.request(`/tv/${tvId}`);
+    return this.mapImagePaths([data])[0];
+  }
+
+  async getTVVideos(tvId: number): Promise<Video[]> {
+    const data = await this.request(`/tv/${tvId}/videos`);
+    return data.results.filter((video: Video) => video.site === 'YouTube');
+  }
+
+  async getTVCredits(tvId: number): Promise<{ cast: Credit[] }> {
+    const data = await this.request(`/tv/${tvId}/credits`);
     data.cast = this.mapImagePaths(data.cast);
     return data;
   }

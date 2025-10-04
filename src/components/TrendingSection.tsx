@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { Link } from 'react-router-dom';
 import { Button } from './ui/button';
 import type { Movie, TVShow, Genre } from '../lib/api/TMDbServices';
 import { getMovieGenres, getMoviesByGenre, getPopularMovies, getPopularTVShows, getTrending, getNowPlayingMovies, getOnTheAirTV, getTVByGenre } from '../lib/api/TMDbServices';
@@ -195,7 +196,11 @@ const TrendingSection: React.FC = () => {
           const itemType = getItemType(item);
 
           return (
-            <div key={item.id} className="flex-shrink-0 w-56 group cursor-pointer">
+            <Link
+              key={item.id}
+              to={`/${itemType === 'Movie' ? 'movie' : 'tv'}/${item.id}`}
+              className="flex-shrink-0 w-56 group cursor-pointer"
+            >
               <div className="relative overflow-hidden rounded-lg">
                 {imagePath ? (
                   <img
@@ -230,7 +235,7 @@ const TrendingSection: React.FC = () => {
                   {voteAverage ? `${Math.round(voteAverage * 10)}%` : 'N/A'}
                 </p>
               </div>
-            </div>
+            </Link>
           );
         })}
       </div>
