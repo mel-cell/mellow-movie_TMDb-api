@@ -1,178 +1,86 @@
 import React, { useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
-import { tmdbService, Movie, TVShow, Person } from '../lib/api/TMDbService';
+import { tmdbService } from '@/lib/api/TMDbServices';
+import type { Movie, TVShow } from '@/lib/api/TMDbServices';
+import HeroSection from '@/components/HeroSection';
+import TrendingSection from '@/components/TrendingSection';
 
 const MainPage: React.FC = () => {
-  const location = useLocation();
-  const [content, setContent] = useState<{
-    trendingMovies: Movie[];
-    trendingTV: TVShow[];
-    trendingPeople: Person[];
-    popularMovies: Movie[];
-    popularTV: TVShow[];
-    randomTrailer: any;
-  }>({
-    trendingMovies: [],
-    trendingTV: [],
-    trendingPeople: [],
-    popularMovies: [],
-    popularTV: [],
-    randomTrailer: null,
-  });
+  const [trendingAll, setTrendingAll] = useState<(Movie | TVShow)[]>([]);
+  const [heroItem, setHeroItem] = useState<Movie | TVShow | null>(null);
 
   useEffect(() => {
-    const loadData = async () => {
+    const fetchTrending = async () => {
       try {
-        const [trendingMovies, trendingTV, trendingPeople, popularMovies, popularTV, randomTrailer] = await Promise.all([
-          tmdbService.getTrending('movie'),
-          tmdbService.getTrending('tv'),
-          tmdbService.getTrending('person'),
-          tmdbService.getPopularMovies(),
-          tmdbService.getPopularTVShows(),
-          tmdbService.getRandomTrendingMovieTrailer(),
-        ]);
-        setContent({
-          trendingMovies: trendingMovies.results,
-          trendingTV: trendingTV.results,
-          trendingPeople: trendingPeople.results,
-          popularMovies: popularMovies.results,
-          popularTV: popularTV.results,
-          randomTrailer,
-        });
+        // ambil data dari /trending/all/day
+        const trendingData = await tmdbService.getTrending('all', 'day');
+
+        if (trendingData.results.length > 0) {
+          setTrendingAll(trendingData.results);
+
+          // pilih 1 item acak buat hero section
+          const random = trendingData.results[
+            Math.floor(Math.random() * trendingData.results.length)
+          ];
+          setHeroItem(random);
+        }
       } catch (error) {
-        console.error('Error loading data:', error);
+        console.error('Error fetching trending data:', error);
       }
     };
-    loadData();
+
+    fetchTrending();
   }, []);
 
-  const renderContent = () => {
-    const path = location.pathname;
-    if (path === '/' || path === '/home') {
-      return (
-        <div>
-          {/* Hero Section */}
-          {content.randomTrailer && (
-            <div className="relative h-96 bg-black">
-              <iframe
-                src={`https://www.youtube.com/embed/${content.randomTrailer.trailer?.key}?autoplay=1&mute=1&loop=1&playlist=${content.randomTrailer.trailer?.key}`}
-                className="w-full h-full"
-                allow="autoplay; encrypted-media"
-              ></iframe>
-              <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-                <h1 className="text-white text-4xl font-bold">{content.randomTrailer.movie.title}</h1>
-              </div>
-            </div>
-          )}
-          {/* Trending Sections */}
-          <section className="p-4">
-            <h2 className="text-2xl font-bold mb-4">Trending Movies</h2>
-            <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-              {content.trendingMovies.slice(0, 5).map((movie) => (
-                <div key={movie.id} className="bg-gray-800 p-2 rounded">
-                  {movie.poster_path && <img src={movie.poster_path} alt={movie.title} className="w-full h-64 object-cover" />}
-                  <h3 className="text-white mt-2">{movie.title}</h3>
-                </div>
-              ))}
-            </div>
-          </section>
-          <section className="p-4">
-            <h2 className="text-2xl font-bold mb-4">Trending TV Shows</h2>
-            <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-              {content.trendingTV.slice(0, 5).map((show) => (
-                <div key={show.id} className="bg-gray-800 p-2 rounded">
-                  {show.poster_path && <img src={show.poster_path} alt={show.name} className="w-full h-64 object-cover" />}
-                  <h3 className="text-white mt-2">{show.name}</h3>
-                </div>
-              ))}
-            </div>
-          </section>
-          <section className="p-4">
-            <h2 className="text-2xl font-bold mb-4">Trending People</h2>
-            <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-              {content.trendingPeople.slice(0, 5).map((person) => (
-                <div key={person.id} className="bg-gray-800 p-2 rounded">
-                  {person.profile_path && <img src={person.profile_path} alt={person.name} className="w-full h-64 object-cover" />}
-                  <h3 className="text-white mt-2">{person.name}</h3>
-                </div>
-              ))}
-            </div>
-          </section>
-        </div>
-      );
-    } else if (path === '/movie') {
-      return (
-        <div className="p-4">
-          <h1 className="text-3xl font-bold mb-4">Popular Movies</h1>
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-            {content.popularMovies.map((movie) => (
-              <div key={movie.id} className="bg-gray-800 p-2 rounded">
-                {movie.poster_path && <img src={movie.poster_path} alt={movie.title} className="w-full h-64 object-cover" />}
-                <h3 className="text-white mt-2">{movie.title}</h3>
-              </div>
-            ))}
-          </div>
-        </div>
-      );
-    } else if (path === '/tv') {
-      return (
-        <div className="p-4">
-          <h1 className="text-3xl font-bold mb-4">Popular TV Shows</h1>
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-            {content.popularTV.map((show) => (
-              <div key={show.id} className="bg-gray-800 p-2 rounded">
-                {show.poster_path && <img src={show.poster_path} alt={show.name} className="w-full h-64 object-cover" />}
-                <h3 className="text-white mt-2">{show.name}</h3>
-              </div>
-            ))}
-          </div>
-        </div>
-      );
-    } else if (path === '/trending') {
-      return (
-        <div className="p-4">
-          <h1 className="text-3xl font-bold mb-4">Trending</h1>
-          {/* Similar to home, but focused on trending */}
-          <section className="mb-8">
-            <h2 className="text-2xl font-bold mb-4">Movies</h2>
-            <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-              {content.trendingMovies.slice(0, 10).map((movie) => (
-                <div key={movie.id} className="bg-gray-800 p-2 rounded">
-                  {movie.poster_path && <img src={movie.poster_path} alt={movie.title} className="w-full h-64 object-cover" />}
-                  <h3 className="text-white mt-2">{movie.title}</h3>
-                </div>
-              ))}
-            </div>
-          </section>
-          <section className="mb-8">
-            <h2 className="text-2xl font-bold mb-4">TV Shows</h2>
-            <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-              {content.trendingTV.slice(0, 10).map((show) => (
-                <div key={show.id} className="bg-gray-800 p-2 rounded">
-                  {show.poster_path && <img src={show.poster_path} alt={show.name} className="w-full h-64 object-cover" />}
-                  <h3 className="text-white mt-2">{show.name}</h3>
-                </div>
-              ))}
-            </div>
-          </section>
-          <section>
-            <h2 className="text-2xl font-bold mb-4">People</h2>
-            <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-              {content.trendingPeople.slice(0, 10).map((person) => (
-                <div key={person.id} className="bg-gray-800 p-2 rounded">
-                  {person.profile_path && <img src={person.profile_path} alt={person.name} className="w-full h-64 object-cover" />}
-                  <h3 className="text-white mt-2">{person.name}</h3>
-                </div>
-              ))}
-            </div>
-          </section>
-        </div>
-      );
-    }
-    return <div>Page not found</div>;
-  };
+  return (
+    <div className="min-h-screen bg-black text-white">
+      {/* 🧭 Hero Section */}
+      {heroItem && (
+        <HeroSection
+          heroMovie={heroItem as Movie}
+          heroTrailer={null}
+          heroCast={[]}
+        />
+      )}
 
-  return <div className="bg-gray-900 text-white min-h-screen">{renderContent()}</div>;
+      {/* 🔥 Trending Section */}
+      <div className="max-w-screen-2xl mx-auto px-5 py-10">
+        <h1 className="text-4xl font-extrabold text-red-500 mb-8">
+          🔥 Trending Now
+        </h1>
+
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-6 gap-6">
+          {trendingAll.map((item) => (
+            <div
+              key={item.id}
+              className="bg-gray-800 rounded-2xl overflow-hidden shadow-lg hover:scale-105 transition-transform duration-300"
+            >
+              {item.poster_path ? (
+                <img
+                  src={`https://image.tmdb.org/t/p/w500${item.poster_path}`}
+                  alt={"title" in item ? item.title : (item as TVShow).name}
+                  className="w-full h-72 object-cover"
+                />
+              ) : (
+                <div className="w-full h-72 bg-gray-700 flex items-center justify-center text-gray-400 text-sm">
+                  No Image
+                </div>
+              )}
+              <div className="p-3 text-center">
+                <h3 className="text-sm font-semibold truncate">
+                  {"title" in item ? item.title : (item as TVShow).name}
+                </h3>
+                <p className="text-xs text-gray-400 mt-1 uppercase">
+                  {item.media_type === 'movie' ? 'Movie' : 'TV Show'}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Optional: bisa tambahin rekomendasi / trailer di bawah */}
+    </div>
+  );
 };
 
 export default MainPage;
