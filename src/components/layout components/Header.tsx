@@ -73,7 +73,7 @@ const Header: React.FC = () => {
       isScrolled ? 'bg-black/80 backdrop-blur-md shadow-lg' : 'bg-black/40 backdrop-blur-sm'
     }`}>
       <div className="container mx-auto flex justify-between items-center">
-        <Link to="/" className="text-3xl font-bold text-red-600">Mellow</Link>
+        <Link to="/" className="text-3xl font-bold text-red-600">Netflix</Link>
         
         {/* Desktop Nav - Right side */}
         <nav className="hidden md:flex items-center space-x-8">
