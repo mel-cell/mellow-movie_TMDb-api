@@ -175,7 +175,7 @@ const Header: React.FC = () => {
             <Button
               variant="ghost"
               size="icon"
-              className="text-white"
+              className="text-white bg-transparent hover:bg-white/10"
               onClick={() => setOpenSearch(true)}
             >
               <Search className="h-5 w-5" />

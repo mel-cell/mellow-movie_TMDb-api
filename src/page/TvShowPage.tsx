@@ -28,7 +28,7 @@ const TvShowPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-zinc-950 via-black to-zinc-900 text-white p-6 pt-24">
       {/* Judul Page */}
-      <h1 className="text-3xl font-bold mb-6 text-gray-100 tracking-wide">
+      <h1 className="text-3xl font-bold mb-6 text-gray-100 tracking-wide ">
         Discover TV Shows
       </h1>
 
@@ -36,7 +36,7 @@ const TvShowPage: React.FC = () => {
       {loading ? (
         <p className="text-gray-400">Loading TV shows...</p>
       ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6 max-w-7xl mx-auto">
           {tvShows.map((show) => (
             <a
               key={show.id}
