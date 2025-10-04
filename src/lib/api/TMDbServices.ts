@@ -196,8 +196,6 @@ class TMDbService {
   }
 
   
-
-
   // Similar Movies
   async getSimilarMovies(
     movieId: number,
