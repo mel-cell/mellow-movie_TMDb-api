@@ -215,7 +215,7 @@ const Header: React.FC = () => {
             to="/"
             className="text-2xl md:text-3xl font-bold text-red-600 hover:text-red-600"
           >
-            Netflix
+            Flixworld
           </Link>
 
           {/* Desktop Nav */}
