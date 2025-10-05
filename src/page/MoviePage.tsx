@@ -7,8 +7,10 @@ import {
 import type { Movie } from "../lib/api/TMDbServices";
 import MediaCard from "../components/MediaCard";
 import SimplePagination from "../components/ui/SimplePagination";
+import { useTranslation } from "react-i18next";
 
 const MoviePage: React.FC = () => {
+  const { t } = useTranslation();
   const [movies, setMovies] = useState<Movie[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -53,7 +55,7 @@ const MoviePage: React.FC = () => {
         }
       } catch (err: any) {
         console.error(err);
-        setError("Gagal memuat data film");
+        setError(t('movie.failedToLoad'));
       } finally {
         setLoading(false);
       }
@@ -79,8 +81,8 @@ const MoviePage: React.FC = () => {
 
   return (
     <div className="bg-black min-h-screen text-white pt-20">
-      <div className="max-w-7xl mx-auto p-6">
-        <h1 className="text-3xl font-bold mb-6 text-red-500">Popular Movies</h1>
+      <div className="max-w-7xl mx-auto p-4 md:p-6">
+        <h1 className="text-3xl font-bold mb-6 text-red-500">{t('movie.popularMovies')}</h1>
 
         {/* 🔹 FILTER GENRE */}
         <div className="mb-6">
@@ -88,7 +90,7 @@ const MoviePage: React.FC = () => {
             htmlFor="genre"
             className="mr-3 text-lg font-semibold text-gray-200"
           >
-            Pilih Genre:
+            {t('movie.selectGenre')}
           </label>
           <select
             id="genre"
@@ -100,7 +102,7 @@ const MoviePage: React.FC = () => {
               setPage(1); // reset ke halaman pertama
             }}
           >
-            <option value="">Semua Genre</option>
+            <option value="">{t('movie.allGenres')}</option>
             {genres.map((genre) => (
               <option key={genre.id} value={genre.id}>
                 {genre.name}

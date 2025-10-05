@@ -2,12 +2,16 @@ import React, { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { tmdbService } from "@/lib/api/TMDbServices";
 import { Skeleton } from "@/components/ui/skeleton";
+import MediaCard from "@/components/MediaCard";
+import type { Movie, TVShow } from "@/lib/api/TMDbServices";
 
 const ProfilePage: React.FC = () => {
   const { user, sessionId } = useAuth();
   const [ratedMoviesCount, setRatedMoviesCount] = useState<number | null>(null);
   const [ratedTVCount, setRatedTVCount] = useState<number | null>(null);
   const [favoritesCount, setFavoritesCount] = useState<number | null>(null);
+  const [ratedMovies, setRatedMovies] = useState<Movie[]>([]);
+  const [ratedTVShows, setRatedTVShows] = useState<TVShow[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -19,15 +23,17 @@ const ProfilePage: React.FC = () => {
         setLoading(true);
         setError(null);
 
-        const [ratedMovies, ratedTV, favorites] = await Promise.all([
+        const [ratedMoviesData, ratedTVData, favorites] = await Promise.all([
           tmdbService.getRatedMovies(user.id.toString(), sessionId),
           tmdbService.getRatedTVShows(user.id.toString(), sessionId),
           tmdbService.getFavorites(user.id.toString(), sessionId),
         ]);
 
-        setRatedMoviesCount(ratedMovies.total_results);
-        setRatedTVCount(ratedTV.total_results);
+        setRatedMoviesCount(ratedMoviesData.total_results);
+        setRatedTVCount(ratedTVData.total_results);
         setFavoritesCount(favorites.total_results);
+        setRatedMovies(ratedMoviesData.results);
+        setRatedTVShows(ratedTVData.results);
       } catch (err) {
         console.error("Error fetching profile stats:", err);
         setError("Failed to load profile statistics. Please try again.");
@@ -103,6 +109,40 @@ const ProfilePage: React.FC = () => {
             <p className="text-3xl font-bold">{favoritesCount ?? "-"}</p>
           </div>
         </div>
+
+        {/* Rated Movies History */}
+        {ratedMovies.length > 0 && (
+          <div className="mt-8">
+            <h2 className="text-2xl font-semibold mb-4">Rated Movies History</h2>
+            <div className="grid gap-4 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+              {ratedMovies.map((movie) => (
+                <div key={movie.id} className="relative">
+                  <MediaCard item={movie} />
+                  <div className="absolute top-2 right-2 bg-red-600 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold">
+                    {(movie as any).rating}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Rated TV Shows History */}
+        {ratedTVShows.length > 0 && (
+          <div className="mt-8">
+            <h2 className="text-2xl font-semibold mb-4">Rated TV Shows History</h2>
+            <div className="grid gap-4 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+              {ratedTVShows.map((show) => (
+                <div key={show.id} className="relative">
+                  <MediaCard item={show} />
+                  <div className="absolute top-2 right-2 bg-red-600 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold">
+                    {(show as any).rating}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

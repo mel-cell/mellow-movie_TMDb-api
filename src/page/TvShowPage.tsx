@@ -7,8 +7,10 @@ import {
 import MediaCard from "../components/MediaCard";
 import SimplePagination from "../components/ui/SimplePagination";
 import type { TVShow } from "../lib/api/TMDbServices";
+import { useTranslation } from "react-i18next";
 
 const TvShowPage: React.FC = () => {
+  const { t } = useTranslation();
   const [tvShows, setTvShows] = useState<TVShow[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -67,7 +69,7 @@ const TvShowPage: React.FC = () => {
         setTotalPages(data.total_pages);
       } catch (err: any) {
         console.error(err);
-        setError("Gagal memuat data TV Shows");
+        setError(t('tv.failedToLoad'));
       } finally {
         setLoading(false);
       }
@@ -95,7 +97,7 @@ const TvShowPage: React.FC = () => {
       <div className="max-w-7xl mx-auto p-6">
         {/* 🔹 Judul */}
         <h1 className="text-3xl font-bold mb-6 text-red-500">
-          Popular TV Shows
+          {t('tv.popularTVShows')}
         </h1>
 
         {/* 🔹 Filter Genre */}
@@ -104,7 +106,7 @@ const TvShowPage: React.FC = () => {
             htmlFor="genre"
             className="mr-3 text-lg font-semibold text-gray-200"
           >
-            Pilih Genre:
+            {t('tv.selectGenre')}
           </label>
           <select
             id="genre"
@@ -116,7 +118,7 @@ const TvShowPage: React.FC = () => {
               setPage(1);
             }}
           >
-            <option value="">Semua Genre</option>
+            <option value="">{t('tv.allGenres')}</option>
             {genres.map((genre) => (
               <option key={genre.id} value={genre.id}>
                 {genre.name}

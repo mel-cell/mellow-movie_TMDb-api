@@ -42,5 +42,43 @@
     "english": "English",
     "indonesian": "Indonesian",
     "switchLanguage": "Switch Language"
+  },
+  "detail": {
+    "error": "Error",
+    "itemNotFound": "Item not found",
+    "backToHome": "Back to Home",
+    "back": "Back",
+    "seasons": "Seasons",
+    "episode": "episode",
+    "episodes": "episodes",
+    "overview": "Overview",
+    "yourRating": "Your Rating:",
+    "rateThis": "Rate this",
+    "addToFavorites": "Add to Favorites",
+    "removeFromFavorites": "Remove from Favorites",
+    "videos": "Videos",
+    "cast": "Cast",
+    "originalTitle": "Original Title",
+    "originalName": "Original Name",
+    "status": "Status",
+    "language": "Language",
+    "budget": "Budget",
+    "revenue": "Revenue",
+    "homepage": "Homepage",
+    "visitWebsite": "Visit Website",
+    "similarMovies": "Similar Movies",
+    "similarTVShows": "Similar TV Shows"
+  },
+  "movie": {
+    "popularMovies": "Popular Movies",
+    "selectGenre": "Select Genre:",
+    "allGenres": "All Genres",
+    "failedToLoad": "Failed to load movie data"
+  },
+  "tv": {
+    "popularTVShows": "Popular TV Shows",
+    "selectGenre": "Select Genre:",
+    "allGenres": "All Genres",
+    "failedToLoad": "Failed to load TV show data"
   }
 }

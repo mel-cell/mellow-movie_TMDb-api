@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useReducer } from "react";
 import { useParams, Link, useLocation } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
@@ -94,6 +95,7 @@ const reducer = (state: DetailState, action: Action): DetailState => {
 };
 
 const DetailPage: React.FC = () => {
+  const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
   const location = useLocation();
   const type = location.pathname.startsWith("/movie") ? "movie" : "tv";
@@ -260,12 +262,12 @@ const DetailPage: React.FC = () => {
     return (
       <div className="min-h-screen bg-black text-white flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-2xl font-bold mb-4">Error</h1>
-          <p className="text-gray-400 mb-6">{state.error || "Item not found"}</p>
+          <h1 className="text-2xl font-bold mb-4">{t('detail.error')}</h1>
+          <p className="text-gray-400 mb-6">{state.error || t('detail.itemNotFound')}</p>
           <Link to="/">
             <Button variant="outline" className="text-white border-white">
               <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Home
+              {t('detail.backToHome')}
             </Button>
           </Link>
         </div>
@@ -296,7 +298,7 @@ const DetailPage: React.FC = () => {
           <div className="w-full h-96 bg-gray-800" />
         )}
         <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
-        <div className="absolute left-20">
+        <div className="absolute left-4 md:left-20 top-4">
           <Link to="/">
             <Button
               variant="outline"
@@ -304,7 +306,7 @@ const DetailPage: React.FC = () => {
               className="text-white border-white bg-black/50"
             >
               <ArrowLeft className="w-4 h-4 mr-2" />
-              Back
+              {t('detail.back')}
             </Button>
           </Link>
         </div>
@@ -314,15 +316,15 @@ const DetailPage: React.FC = () => {
         <div className="flex flex-col md:flex-row gap-8">
           {/* Poster */}
           <div className="">
-            <div className="flex-shrink-0">
+            <div className="flex-shrink-0 max-w-80 mx-auto md:mx-0">
               {state.details.poster_path ? (
                 <img
                   src={state.details.poster_path}
                   alt={title}
-                  className="w-80 h-120 object-cover rounded-lg shadow-lg"
+                  className="w-full h-auto object-cover rounded-lg shadow-lg"
                 />
               ) : (
-                <div className="w-80 h-120 bg-gray-800 rounded-lg flex items-center justify-center">
+                <div className="w-full aspect-[2/3] bg-gray-800 rounded-lg flex items-center justify-center">
                   <span className="text-gray-500">No Image</span>
                 </div>
               )}
@@ -334,7 +336,7 @@ const DetailPage: React.FC = () => {
               state.details.seasons &&
               state.details.seasons.length > 0 && (
                 <div className="mb-8 max-w-80 mt-10 ">
-                  <h2 className="text-2xl font-semibold mb-4">Seasons</h2>
+                  <h2 className="text-2xl font-semibold mb-4">{t('detail.seasons')}</h2>
                   <div className="space-y-4 h-96 overflow-y-auto pr-2">
                     {state.details.seasons.map((season) => (
                       <div key={season.id}>
@@ -362,8 +364,7 @@ const DetailPage: React.FC = () => {
                                   {season.name}
                                 </h3>
                                 <p className="text-sm text-gray-400">
-                                  {season.episode_count} episode
-                                  {season.episode_count !== 1 ? "s" : ""}
+                                  {season.episode_count} {season.episode_count !== 1 ? t('detail.episodes') : t('detail.episode')}
                                 </p>
                                 {season.air_date && (
                                   <p className="text-sm text-gray-400">
@@ -442,7 +443,7 @@ const DetailPage: React.FC = () => {
 
           {/* Details */}
           <div className="flex-1">
-            <h1 className="text-4xl font-bold mb-2">{title}</h1>
+            <h1 className="text-2xl md:text-4xl font-bold mb-2">{title}</h1>
             {state.details.tagline && (
               <p className="text-xl text-gray-300 italic mb-4">
                 "{state.details.tagline}"
@@ -499,7 +500,7 @@ const DetailPage: React.FC = () => {
             </div>
 
             <div className="mb-8">
-              <h2 className="text-2xl font-semibold mb-4">Overview</h2>
+              <h2 className="text-2xl font-semibold mb-4">{t('detail.overview')}</h2>
               <p className="text-gray-300 leading-relaxed">
                 {state.details.overview}
               </p>
@@ -511,7 +512,7 @@ const DetailPage: React.FC = () => {
                 <div className="flex items-center gap-2">
                   <Star className="w-5 h-5 text-yellow-500" />
                   <label htmlFor="rating" className="text-white font-semibold">
-                    Your Rating:
+                    {t('detail.yourRating')}
                   </label>
                   <select
                     id="rating"
@@ -520,7 +521,7 @@ const DetailPage: React.FC = () => {
                     disabled={state.ratingLoading}
                     className="bg-gray-800 text-white rounded px-3 py-1 border border-gray-600"
                   >
-                    <option value="">Rate this {type}</option>
+                    <option value="">{t('detail.rateThis')} {type}</option>
                     {[...Array(10)].map((_, i) => (
                       <option key={i + 1} value={i + 1}>
                         {i + 1}
@@ -542,7 +543,7 @@ const DetailPage: React.FC = () => {
                   <Heart
                     className={`w-4 h-4 ${state.isFavorite ? "fill-current" : ""}`}
                   />
-                  {state.isFavorite ? "Remove from Favorites" : "Add to Favorites"}
+                  {state.isFavorite ? t('detail.removeFromFavorites') : t('detail.addToFavorites')}
                 </Button>
               </div>
             )}
@@ -550,7 +551,7 @@ const DetailPage: React.FC = () => {
             {/* Videos */}
             {state.videos.length > 0 && (
               <div className="mb-8">
-                <h2 className="text-2xl font-semibold mb-4">Videos</h2>
+                <h2 className="text-2xl font-semibold mb-4">{t('detail.videos')}</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {state.videos.slice(0, 4).map((video: any) => (
                     <Card
@@ -577,7 +578,7 @@ const DetailPage: React.FC = () => {
             {/* Cast */}
             {state.credits && state.credits.cast.length > 0 && (
               <div className="mb-8">
-                <h2 className="text-2xl font-semibold mb-4">Cast</h2>
+                <h2 className="text-2xl font-semibold mb-4">{t('detail.cast')}</h2>
                 <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
                   {state.credits.cast.slice(0, 12).map((actor: any) => (
                     <div key={actor.id} className="text-center">
@@ -607,30 +608,30 @@ const DetailPage: React.FC = () => {
               {"original_title" in state.details &&
                 state.details.original_title !== state.details.title && (
                   <div>
-                    <h3 className="font-semibold mb-1">Original Title</h3>
+                    <h3 className="font-semibold mb-1">{t('detail.originalTitle')}</h3>
                     <p className="text-gray-300">{state.details.original_title}</p>
                   </div>
                 )}
               {"original_name" in state.details &&
                 state.details.original_name !== state.details.name && (
                   <div>
-                    <h3 className="font-semibold mb-1">Original Name</h3>
+                    <h3 className="font-semibold mb-1">{t('detail.originalName')}</h3>
                     <p className="text-gray-300">{state.details.original_name}</p>
                   </div>
                 )}
               <div>
-                <h3 className="font-semibold mb-1">Status</h3>
+                <h3 className="font-semibold mb-1">{t('detail.status')}</h3>
                 <p className="text-gray-300">{state.details.status}</p>
               </div>
               <div>
-                <h3 className="font-semibold mb-1">Language</h3>
+                <h3 className="font-semibold mb-1">{t('detail.language')}</h3>
                 <p className="text-gray-300">
                   {state.details.original_language.toUpperCase()}
                 </p>
               </div>
               {"budget" in state.details && state.details.budget > 0 && (
                 <div>
-                  <h3 className="font-semibold mb-1">Budget</h3>
+                  <h3 className="font-semibold mb-1">{t('detail.budget')}</h3>
                   <p className="text-gray-300">
                     ${state.details.budget.toLocaleString()}
                   </p>
@@ -638,7 +639,7 @@ const DetailPage: React.FC = () => {
               )}
               {"revenue" in state.details && state.details.revenue > 0 && (
                 <div>
-                  <h3 className="font-semibold mb-1">Revenue</h3>
+                  <h3 className="font-semibold mb-1">{t('detail.revenue')}</h3>
                   <p className="text-gray-300">
                     ${state.details.revenue.toLocaleString()}
                   </p>
@@ -646,14 +647,14 @@ const DetailPage: React.FC = () => {
               )}
               {state.details.homepage && (
                 <div>
-                  <h3 className="font-semibold mb-1">Homepage</h3>
+                  <h3 className="font-semibold mb-1">{t('detail.homepage')}</h3>
                   <a
                     href={state.details.homepage}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-blue-400 hover:text-blue-300"
                   >
-                    Visit Website
+                    {t('detail.visitWebsite')}
                   </a>
                 </div>
               )}
@@ -664,7 +665,7 @@ const DetailPage: React.FC = () => {
         {state.similar.length > 0 && (
           <div className="mb-8">
             <h2 className="text-2xl font-semibold mb-4">
-              Similar {type === "movie" ? "Movies" : "TV Shows"}
+              {type === "movie" ? t('detail.similarMovies') : t('detail.similarTVShows')}
             </h2>
             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
               {state.similar.map((item: any) => (

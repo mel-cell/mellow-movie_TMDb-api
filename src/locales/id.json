@@ -42,5 +42,43 @@
     "english": "Inggris",
     "indonesian": "Indonesia",
     "switchLanguage": "Ganti Bahasa"
+  },
+  "detail": {
+    "error": "Kesalahan",
+    "itemNotFound": "Item tidak ditemukan",
+    "backToHome": "Kembali ke Beranda",
+    "back": "Kembali",
+    "seasons": "Musim",
+    "episode": "episode",
+    "episodes": "episode",
+    "overview": "Ringkasan",
+    "yourRating": "Rating Anda:",
+    "rateThis": "Beri rating",
+    "addToFavorites": "Tambah ke Favorit",
+    "removeFromFavorites": "Hapus dari Favorit",
+    "videos": "Video",
+    "cast": "Pemeran",
+    "originalTitle": "Judul Asli",
+    "originalName": "Nama Asli",
+    "status": "Status",
+    "language": "Bahasa",
+    "budget": "Anggaran",
+    "revenue": "Pendapatan",
+    "homepage": "Homepage",
+    "visitWebsite": "Kunjungi Situs Web",
+    "similarMovies": "Film Serupa",
+    "similarTVShows": "Acara TV Serupa"
+  },
+  "movie": {
+    "popularMovies": "Film Populer",
+    "selectGenre": "Pilih Genre:",
+    "allGenres": "Semua Genre",
+    "failedToLoad": "Gagal memuat data film"
+  },
+  "tv": {
+    "popularTVShows": "Acara TV Populer",
+    "selectGenre": "Pilih Genre:",
+    "allGenres": "Semua Genre",
+    "failedToLoad": "Gagal memuat data acara TV"
   }
 }

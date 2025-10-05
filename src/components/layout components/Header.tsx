@@ -43,7 +43,10 @@ const Header: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const { user, logout } = useAuth();
   const isLoggedIn = !!user;
-  const [openSearch, setOpenSearch] = useState(false);
+  const [openSearch, setOpenSearch] = useState(() => {
+    const saved = localStorage.getItem('openSearch');
+    return saved === 'true';
+  });
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<(Movie | TVShow)[]>([]);
   const [isSearching, setIsSearching] = useState(false);
@@ -75,7 +78,12 @@ const Header: React.FC = () => {
     } else {
       document.documentElement.classList.remove("dark");
     }
-  }, [theme]);  
+  }, [theme]);
+
+  // Persist openSearch state
+  useEffect(() => {
+    localStorage.setItem('openSearch', openSearch.toString());
+  }, [openSearch]);
 
   // Toggle theme function
   const toggleTheme = () => {
@@ -196,7 +204,7 @@ const Header: React.FC = () => {
   return (
     <>
       <header
-        className={`fixed top-0 left-0 w-full z-50 text-white py-4 px-6 transition-all duration-300 ${
+        className={`fixed top-0 left-0 w-full z-50 text-white py-3 md:py-4 px-4 md:px-6 transition-all duration-300 ${
           isScrolled
             ? "bg-black/80 backdrop-blur-md shadow-lg"
             : "bg-black/40 backdrop-blur-sm"
@@ -205,7 +213,7 @@ const Header: React.FC = () => {
         <div className="container mx-auto flex justify-between items-center">
           <Link
             to="/"
-            className="text-3xl font-bold text-red-600 hover:text-red-600"
+            className="text-2xl md:text-3xl font-bold text-red-600 hover:text-red-600"
           >
             Netflix
           </Link>
@@ -250,7 +258,7 @@ const Header: React.FC = () => {
           </nav>
 
           {/* Right side */}
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-2 md:space-x-4">
 
             {/* Language Switcher */}
             <DropdownMenu>
@@ -278,48 +286,50 @@ const Header: React.FC = () => {
               <Search className="h-5 w-5" />
             </Button>
 
-            {/* Login / User */}
-            {!isLoggedIn ? (
-              <div className="flex space-x-2">
-                <Link to="/login">
-                  <Button variant="outline" className="text-white border-white">
-                    {t('nav.login')}
-                  </Button>
-                </Link>
-                <Link to="https://www.themoviedb.org/signup" target="_blank" rel="noopener noreferrer">
-                  <Button className="bg-red-600 hover:bg-red-700 text-white">
-                    {t('nav.signup')}
-                  </Button>
-                </Link>
-              </div>
-            ) : (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="text-white bg-transparent ">
-                    <User className="w-4 h-4 mr-2" />
-                    {user?.username}
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className="bg-black/90 text-white border-gray-700">
-                  <DropdownMenuItem asChild>
-                    <Link to="/profile" className="flex items-center text-white">
-                      <Settings className="w-4 h-4 mr-2" />
-                      {t('nav.profile')}
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link to="/favorites" className="flex items-center text-white">
-                      <Heart className="w-4 h-4 mr-2" />
-                      {t('nav.favorites')}
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => logout()} className="flex items-center">
-                    <LogOut className="w-4 h-4 mr-2" />
-                    {t('nav.logout')}
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            )}
+            {/* Login / User - Hidden on mobile */}
+            <div className="hidden md:flex">
+              {!isLoggedIn ? (
+                <div className="flex space-x-2">
+                  <Link to="/login">
+                    <Button variant="outline" className="text-white border-white">
+                      {t('nav.login')}
+                    </Button>
+                  </Link>
+                  <Link to="https://www.themoviedb.org/signup" target="_blank" rel="noopener noreferrer">
+                    <Button className="bg-red-600 hover:bg-red-700 text-white">
+                      {t('nav.signup')}
+                    </Button>
+                  </Link>
+                </div>
+              ) : (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" className="text-white bg-transparent ">
+                      <User className="w-4 h-4 md:mr-2" />
+                      <span className="hidden md:inline">{user?.username}</span>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="bg-black/90 text-white border-gray-700">
+                    <DropdownMenuItem asChild>
+                      <Link to="/profile" className="flex items-center text-white">
+                        <Settings className="w-4 h-4 mr-2" />
+                        {t('nav.profile')}
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link to="/favorites" className="flex items-center text-white">
+                        <Heart className="w-4 h-4 mr-2" />
+                        {t('nav.favorites')}
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => logout()} className="flex items-center">
+                      <LogOut className="w-4 h-4 mr-2" />
+                      {t('nav.logout')}
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              )}
+            </div>
           </div>
 
           {/* Mobile Menu */}
@@ -328,7 +338,7 @@ const Header: React.FC = () => {
               <Button
                 variant="ghost"
                 size="icon"
-                className="md:hidden text-white"
+                className="md:hidden text-white bg-transparent hover:bg-white/10"
               >
                 <Menu className="h-5 w-5" />
               </Button>
@@ -343,6 +353,37 @@ const Header: React.FC = () => {
                 <Link to="/tv">{t('nav.tvShows')}</Link>
                 <Link to="/trending">{t('nav.trending')}</Link>
                 <Link to="/actors">{t('nav.actors')}</Link>
+                <div className="border-t border-gray-700 pt-4 mt-4">
+                  {!isLoggedIn ? (
+                    <div className="flex flex-col space-y-2">
+                      <Link to="/login">
+                        <Button variant="outline" className="w-full text-white border-white">
+                          {t('nav.login')}
+                        </Button>
+                      </Link>
+                      <Link to="https://www.themoviedb.org/signup" target="_blank" rel="noopener noreferrer">
+                        <Button className="w-full bg-red-600 hover:bg-red-700 text-white">
+                          {t('nav.signup')}
+                        </Button>
+                      </Link>
+                    </div>
+                  ) : (
+                    <div className="flex flex-col space-y-2">
+                      <Link to="/profile" className="flex items-center text-white">
+                        <Settings className="w-4 h-4 mr-2" />
+                        {t('nav.profile')}
+                      </Link>
+                      <Link to="/favorites" className="flex items-center text-white">
+                        <Heart className="w-4 h-4 mr-2" />
+                        {t('nav.favorites')}
+                      </Link>
+                      <Button onClick={() => logout()} variant="ghost" className="justify-start text-white">
+                        <LogOut className="w-4 h-4 mr-2" />
+                        {t('nav.logout')}
+                      </Button>
+                    </div>
+                  )}
+                </div>
               </div>
             </SheetContent>
           </Sheet>
