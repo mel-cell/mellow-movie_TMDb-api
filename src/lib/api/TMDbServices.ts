@@ -171,11 +171,13 @@ class TMDbService {
 
     Object.entries(params).forEach(([key, value]) => {
       if (value !== undefined && value !== null) {
+        console.log('Appending param:', key, '=', String(value));
         url.searchParams.append(key, String(value));
       }
     });
 
     try {
+      console.log('API URL:', url.toString());
       const response = await axios.get(url.toString());
       return response.data;
     } catch (error: any) {

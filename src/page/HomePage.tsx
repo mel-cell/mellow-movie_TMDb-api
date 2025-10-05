@@ -1,11 +1,13 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense, lazy } from "react";
 import { tmdbService } from "@/lib/api/TMDbServices";
 import type { Movie, Video } from "@/lib/api/TMDbServices";
 import HeroSection from "@/components/HeroSection";
-import TrendingSection from "@/components/TrendingSection";
-import BrowseSection from "@/components/BrowseSection";
-import VideoPlayRecommended from "@/components/videoPlayrecomended";
-import ActorList from "@/components/actorlist";
+
+// Lazy load components that are below the fold
+const TrendingSection = lazy(() => import("@/components/TrendingSection"));
+const BrowseSection = lazy(() => import("@/components/BrowseSection"));
+const VideoPlayRecommended = lazy(() => import("@/components/videoPlayrecomended"));
+const ActorList = lazy(() => import("@/components/actorlist"));
 
 const HomePage: React.FC = () => {
   const [heroMovie, setHeroMovie] = useState<Movie | null>(null);
@@ -36,9 +38,9 @@ const HomePage: React.FC = () => {
   }, []);
 
 
-  // fetch data
+  // fetch hero movie and trailer data only initially
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchHeroData = async () => {
       try {
         const trendingMovieData = await tmdbService.getTrending("movie", "day");
 
@@ -52,10 +54,25 @@ const HomePage: React.FC = () => {
           setHeroTrailer(videos[0] || null);
         }
       } catch (error) {
-        console.error("Error fetching data:", error);
+        console.error("Error fetching hero data:", error);
       }
     };
-    fetchData();
+    fetchHeroData();
+  }, []);
+
+  // lazy load other data after initial render
+  useEffect(() => {
+    const lazyLoadData = async () => {
+      // You can implement lazy data fetching here for TrendingSection, BrowseSection, etc.
+      // For example, you can trigger events or state updates to fetch data inside those components lazily
+    };
+
+    // Delay lazy loading to after initial render
+    const timer = setTimeout(() => {
+      lazyLoadData();
+    }, 3000); // 3 seconds delay, adjust as needed
+
+    return () => clearTimeout(timer);
   }, []);
 
   // apply theme
@@ -69,20 +86,34 @@ const HomePage: React.FC = () => {
 
       {/* Trending Section */}
       <div className="max-w-screen-2xl mx-auto p-5">
-        <TrendingSection />
+        <Suspense fallback={<div className="h-64 bg-gray-800 animate-pulse rounded"></div>}>
+          <TrendingSection />
+        </Suspense>
+      </div>
+
+      {/* Browse Section */}
+      <div className="max-w-screen-2xl mx-auto p-5">
+        <Suspense fallback={<div className="h-64 bg-gray-800 animate-pulse rounded"></div>}>
+          <BrowseSection />
+        </Suspense>
       </div>
 
       {/* Video Recommended */}
       <div className="max-w-screen-2xl mx-auto p-5">
-        <BrowseSection />
+        {heroMovie && (
+          <Suspense fallback={<div className="h-64 bg-gray-800 animate-pulse rounded"></div>}>
+            <VideoPlayRecommended movieId={heroMovie.id} />
+          </Suspense>
+        )}
       </div>
 
+      {/* Actor List */}
       <div className="max-w-screen-2xl mx-auto p-5">
-        {heroMovie && <VideoPlayRecommended movieId={heroMovie.id} />}
-      </div>
-
-      <div className="max-w-screen-2xl mx-auto p-5">
-        {heroMovie && <ActorList movieId={heroMovie.id} />}
+        {heroMovie && (
+          <Suspense fallback={<div className="h-64 bg-gray-800 animate-pulse rounded"></div>}>
+            <ActorList movieId={heroMovie.id} />
+          </Suspense>
+        )}
       </div>
     </div>
   );

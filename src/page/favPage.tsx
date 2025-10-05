@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
+import React, { useState, useEffect, Suspense, lazy } from "react";
+const Button = lazy(() => import("@/components/ui/button").then(mod => ({ default: mod.Button })));
+const Skeleton = lazy(() => import("@/components/ui/skeleton").then(mod => ({ default: mod.Skeleton })));
 import { X } from "lucide-react";
 import { tmdbService } from "@/lib/api/TMDbServices";
 import type { Movie, TVShow } from "@/lib/api/TMDbServices";
 import { useAuth } from "@/contexts/AuthContext";
-import MediaCard from "@/components/MediaCard";
+const MediaCard = lazy(() => import("@/components/MediaCard"));
 
 type FavoriteItem = (Movie | TVShow) & { mediaType: "movie" | "tv" };
 
@@ -73,11 +73,11 @@ const FavPage: React.FC = () => {
     return (
       <div className="min-h-screen bg-black text-white p-4">
         <h1 className="text-3xl font-bold mb-4">My Favorites</h1>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-          {Array.from({ length: 10 }).map((_, i) => (
-            <Skeleton key={i} className="h-64 bg-gray-800" />
-          ))}
-        </div>
+        <Suspense fallback={<div>Loading skeletons...</div>}>
+          <Skeleton className="h-64 bg-gray-800" />
+          <Skeleton className="h-64 bg-gray-800" />
+          <Skeleton className="h-64 bg-gray-800" />
+        </Suspense>
       </div>
     );
   }

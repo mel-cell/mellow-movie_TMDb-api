@@ -87,6 +87,8 @@ const BrowseSection: React.FC<BrowseSectionProps> = () => {
             params.origin_country = "US";
           }
 
+          console.log("Fetching results with params:", params);
+
           if (category === "tv" || category === "original") {
             data = await tmdbService.discoverTV(params);
           } else {
@@ -94,7 +96,23 @@ const BrowseSection: React.FC<BrowseSectionProps> = () => {
           }
         }
 
-        setResults(data.results);
+        console.log('Results length before filtering:', data.results.length);
+        if (data.results.length > 0) {
+          console.log('First result vote_average before filtering:', data.results[0].vote_average);
+        }
+
+        // Apply client-side rating filter if minRating > 0
+        let filteredResults = data.results;
+        if (minRating > 0) {
+          filteredResults = data.results.filter(item => item.vote_average >= minRating);
+        }
+
+        console.log('Results length after filtering:', filteredResults.length);
+        if (filteredResults.length > 0) {
+          console.log('First result vote_average after filtering:', filteredResults[0].vote_average);
+        }
+
+        setResults(filteredResults);
         setTotalPages(data.total_pages);
       } catch (error) {
         console.error("Error fetching results:", error);
@@ -152,19 +170,22 @@ const BrowseSection: React.FC<BrowseSectionProps> = () => {
           }}
           className="mb-6"
         >
-          <TabsList className="grid w-full grid-cols-3 bg-gray-800">
+          <TabsList className="grid w-full grid-cols-3 bg-white">
             <TabsTrigger
               value="movie"
-              className="data-[state=active]:bg-red-600"
+              className="text-black data-[state=active]:text-white data-[state=active]:bg-red-600"
             >
               Movies
             </TabsTrigger>
-            <TabsTrigger value="tv" className="data-[state=active]:bg-red-600">
+            <TabsTrigger
+              value="tv"
+              className="text-black data-[state=active]:text-white data-[state=active]:bg-red-600"
+            >
               TV Shows
             </TabsTrigger>
             <TabsTrigger
               value="original"
-              className="data-[state=active]:bg-red-600"
+              className="text-black data-[state=active]:text-white data-[state=active]:bg-red-600"
             >
               Original Series
             </TabsTrigger>
@@ -223,7 +244,7 @@ const BrowseSection: React.FC<BrowseSectionProps> = () => {
               <SelectTrigger className="w-full md:w-32 bg-gray-800 border-gray-600 text-white rounded-full">
                 <SelectValue placeholder="Sort By" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="bg-gray-800 border-gray-600 text-white">
                 <SelectItem value="vote_average.desc">Highest Rated</SelectItem>
                 <SelectItem value="title.asc">A-Z</SelectItem>
                 <SelectItem value="title.desc">Z-A</SelectItem>
@@ -238,7 +259,7 @@ const BrowseSection: React.FC<BrowseSectionProps> = () => {
               <SelectTrigger className="w-full md:w-32 bg-gray-800 border-gray-600 text-white rounded-full">
                 <SelectValue placeholder="Year" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="bg-gray-800 border-gray-600 text-white">
                 <SelectItem value="all">All Years</SelectItem>
                 {years
                   .slice(-20)
@@ -255,14 +276,21 @@ const BrowseSection: React.FC<BrowseSectionProps> = () => {
           <div className="flex items-center space-x-4 w-full md:w-auto justify-between md:justify-end">
             <div className="flex items-center space-x-4">
               <span className="text-white text-sm">Rating</span>
-              <Slider
-                value={[minRating]}
-                onValueChange={(value) => setMinRating(value[0])}
-                max={10}
-                step={0.5}
-                className="w-32 md:w-48"
-              />
-              <span className="text-white text-sm">{minRating.toFixed(1)}+ </span>
+              <div className="bg-gray-700 rounded-full p-2 border-2 border-gray-500">
+                <Slider
+                  value={[minRating]}
+                  onValueChange={(value) => {
+                    console.log("Slider value changed to:", value[0]);
+                    setMinRating(value[0]);
+                  }}
+                  max={10}
+                  step={0.5}
+                  className="w-32 md:w-48 [&_[role=slider]]:bg-red-600 [&_[role=slider]]:border-red-600 [&_.relative]:bg-white [&_.relative]:border-2 [&_.relative]:border-gray-400 [&_.absolute]:bg-red-600"
+                />
+              </div>
+              <span className="text-white text-sm">
+                {minRating.toFixed(1)}+{" "}
+              </span>
             </div>
 
             <Button
@@ -278,7 +306,8 @@ const BrowseSection: React.FC<BrowseSectionProps> = () => {
         {/* Results */}
         {searchQuery && (
           <p className="text-gray-400 text-sm mb-4">
-            Note: Filters (genres, year, rating) are not applied to search results.
+            Note: Filters (genres, year, rating) are not applied to search
+            results.
           </p>
         )}
         {loading ? (

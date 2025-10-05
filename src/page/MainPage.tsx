@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, Suspense, lazy } from "react";
 import { tmdbService } from "@/lib/api/TMDbServices";
 import type { Movie, TVShow } from "@/lib/api/TMDbServices";
 import HeroSection from "@/components/HeroSection";
-import MediaCard from "@/components/MediaCard";
+const MediaCard = lazy(() => import("@/components/MediaCard"));
 
 const MainPage: React.FC = () => {
   const [trendingAll, setTrendingAll] = useState<(Movie | TVShow)[]>([]);
@@ -52,11 +52,13 @@ const MainPage: React.FC = () => {
           Trending Now
         </h1>
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-6 gap-6">
-          {trendingAll.map((item) => (
-            <MediaCard key={item.id} item={item} className="h-80" />
-          ))}
-        </div>
+        <Suspense fallback={<div className="h-80 bg-gray-800 animate-pulse rounded"></div>}>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-6 gap-6">
+            {trendingAll.map((item) => (
+              <MediaCard key={item.id} item={item} className="h-80" />
+            ))}
+          </div>
+        </Suspense>
       </div>
     </div>
   );

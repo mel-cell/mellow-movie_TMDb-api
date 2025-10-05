@@ -34,7 +34,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({
         heroTrailer.key
       }?autoplay=1&mute=${isMuted ? 1 : 0}&controls=0&loop=1&playlist=${
         heroTrailer.key
-      }&modestbranding=1&rel=0`;
+      }&modestbranding=1&rel=0&playsinline=1&enablejsapi=1&origin=${window.location.origin}`;
       iframeRef.current.src = src;
     }
   }, [isMuted, heroTrailer]);
