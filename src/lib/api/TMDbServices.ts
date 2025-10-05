@@ -112,12 +112,16 @@ export interface SearchResult<T> {
   total_results: number;
 }
 
-
 export interface DeleteRatingResult {
   success: boolean;
   status_code: number;
   status_message: string;
-  
+}
+
+export interface RatingResult {
+  success: boolean;
+  status_code: number;
+  status_message: string;
 }
 
 export interface Collection {
@@ -133,7 +137,6 @@ export interface MultiSearchResult {
   total_pages: number;
   total_results: number;
 }
-
 
 class TMDbService {
   private apiKey: string;
@@ -195,7 +198,6 @@ class TMDbService {
     return response.json();
   }
 
-  
   // Similar Movies
   async getSimilarMovies(
     movieId: number,
@@ -206,7 +208,59 @@ class TMDbService {
     return data;
   }
 
-  //untuk delete rating film
+  // Similar TV Shows
+  async getSimilarTVShows(
+    tvId: number,
+    page: number = 1
+  ): Promise<SearchResult<TVShow>> {
+    const data = await this.request(`/tv/${tvId}/similar`, { page });
+    data.results = this.mapImagePaths(data.results);
+    return data;
+  }
+
+  // Rating methods
+  async addMovieRating(
+    movieId: number,
+    rating: number,
+    sessionId: string
+  ): Promise<RatingResult> {
+    return this.post(
+      `/movie/${movieId}/rating`,
+      { value: rating },
+      { session_id: sessionId }
+    );
+  }
+
+  async addTVRating(
+    tvId: number,
+    rating: number,
+    sessionId: string
+  ): Promise<RatingResult> {
+    return this.post(
+      `/tv/${tvId}/rating`,
+      { value: rating },
+      { session_id: sessionId }
+    );
+  }
+
+  async deleteMovieRating(
+    movieId: number,
+    sessionId: string
+  ): Promise<DeleteRatingResult> {
+    const url = new URL(`${TMDB_BASE_URL}/movie/${movieId}/rating`);
+    url.searchParams.append("api_key", this.apiKey);
+    url.searchParams.append("session_id", sessionId);
+
+    const response = await fetch(url.toString(), { method: "DELETE" });
+
+    if (!response.ok) {
+      throw new Error(
+        `TMDb API error: ${response.status} ${response.statusText}`
+      );
+    }
+    return response.json();
+  }
+
   async deleteTVRating(
     tvId: number,
     sessionId: string
@@ -223,6 +277,32 @@ class TMDbService {
       );
     }
     return response.json();
+  }
+
+  async getRatedMovies(
+    accountId: string,
+    sessionId: string,
+    page: number = 1
+  ): Promise<SearchResult<Movie>> {
+    const data = await this.request(`/account/${accountId}/rated/movies`, {
+      session_id: sessionId,
+      page,
+    });
+    data.results = this.mapImagePaths(data.results);
+    return data;
+  }
+
+  async getRatedTVShows(
+    accountId: string,
+    sessionId: string,
+    page: number = 1
+  ): Promise<SearchResult<TVShow>> {
+    const data = await this.request(`/account/${accountId}/rated/tv`, {
+      session_id: sessionId,
+      page,
+    });
+    data.results = this.mapImagePaths(data.results);
+    return data;
   }
 
   // Perbaikan: Fungsi Helper untuk memetakan path gambar menjadi URL lengkap
@@ -488,14 +568,15 @@ class TMDbService {
   async addFavorite(
     accountId: string,
     sessionId: string,
-    movieId: number,
+    mediaId: number,
+    mediaType: "movie" | "tv" = "movie",
     favorite: boolean = true
   ): Promise<FavoriteResult> {
     return this.post(
       `/account/${accountId}/favorite`,
       {
-        media_type: "movie",
-        media_id: movieId,
+        media_type: mediaType,
+        media_id: mediaId,
         favorite,
       },
       { session_id: sessionId }
@@ -514,19 +595,32 @@ class TMDbService {
     data.results = this.mapImagePaths(data.results);
     return data;
   }
+
+  async getFavoriteTVShows(
+    accountId: string,
+    sessionId: string,
+    page: number = 1
+  ): Promise<SearchResult<TVShow>> {
+    const data = await this.request(`/account/${accountId}/favorite/tv`, {
+      session_id: sessionId,
+      page,
+    });
+    data.results = this.mapImagePaths(data.results);
+    return data;
+  }
 }
 
 // Export instance
 export const tmdbService = new TMDbService();
 
 // Also export functions for convenience
-export const getPopularMovies = () => tmdbService.getPopularMovies();
-export const getPopularTVShows = () => tmdbService.getPopularTVShows();
+export const getPopularMovies = (page: number = 1) => tmdbService.getPopularMovies(page);
+export const getPopularTVShows = (page: number = 1) => tmdbService.getPopularTVShows(page);
 export const getMovieGenres = () => tmdbService.getMovieGenres();
-export const getMoviesByGenre = (genreId: number) =>
-  tmdbService.getMoviesByGenre(genreId);
-export const getTVByGenre = (genreId: number) =>
-  tmdbService.getTVByGenre(genreId);
+export const getMoviesByGenre = (genreId: number, page: number = 1) =>
+  tmdbService.getMoviesByGenre(genreId, page);
+export const getTVByGenre = (genreId: number, page: number = 1) =>
+  tmdbService.getTVByGenre(genreId, page);
 export const getNowPlayingMovies = () => tmdbService.getNowPlayingMovies();
 export const getOnTheAirTV = () => tmdbService.getOnTheAirTV();
 export const getTrending = (
@@ -538,4 +632,48 @@ export const discoverMovies = (params: any) =>
 export const discoverTV = (params: any) => tmdbService.discoverTV(params);
 export const getSimilarMovies = (movieId: number, page: number = 1) =>
   tmdbService.getSimilarMovies(movieId, page);
+export const getSimilarTVShows = (tvId: number, page: number = 1) =>
+  tmdbService.getSimilarTVShows(tvId, page);
 
+// Favorites
+export const addFavorite = (
+  accountId: string,
+  sessionId: string,
+  mediaId: number,
+  mediaType: "movie" | "tv" = "movie",
+  favorite: boolean = true
+) =>
+  tmdbService.addFavorite(accountId, sessionId, mediaId, mediaType, favorite);
+export const getFavorites = (
+  accountId: string,
+  sessionId: string,
+  page: number = 1
+) => tmdbService.getFavorites(accountId, sessionId, page);
+export const getFavoriteTVShows = (
+  accountId: string,
+  sessionId: string,
+  page: number = 1
+) => tmdbService.getFavoriteTVShows(accountId, sessionId, page);
+
+// Ratings
+export const addMovieRating = (
+  movieId: number,
+  rating: number,
+  sessionId: string
+) => tmdbService.addMovieRating(movieId, rating, sessionId);
+export const addTVRating = (tvId: number, rating: number, sessionId: string) =>
+  tmdbService.addTVRating(tvId, rating, sessionId);
+export const deleteMovieRating = (movieId: number, sessionId: string) =>
+  tmdbService.deleteMovieRating(movieId, sessionId);
+export const deleteTVRating = (tvId: number, sessionId: string) =>
+  tmdbService.deleteTVRating(tvId, sessionId);
+export const getRatedMovies = (
+  accountId: string,
+  sessionId: string,
+  page: number = 1
+) => tmdbService.getRatedMovies(accountId, sessionId, page);
+export const getRatedTVShows = (
+  accountId: string,
+  sessionId: string,
+  page: number = 1
+) => tmdbService.getRatedTVShows(accountId, sessionId, page);

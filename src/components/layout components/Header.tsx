@@ -11,6 +11,9 @@ import {
   Search,
   User,
   Menu,
+  Heart,
+  Settings,
+  LogOut,
 } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "../ui/sheet";
 import {
@@ -21,6 +24,12 @@ import {
   CommandItem,
   CommandList,
 } from "../ui/command";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "../ui/dropdown-menu";
 import { tmdbService } from "../../lib/api/TMDbServices";
 import type { Movie, TVShow } from "../../lib/api/TMDbServices";
 import { useAuth } from "../../contexts/AuthContext";
@@ -226,16 +235,32 @@ const Header: React.FC = () => {
                 </Link>
               </div>
             ) : (
-              <>
-                <span className="text-white font-semibold">{user?.username}</span>
-                <Button
-                  variant="outline"
-                  className="text-white"
-                  onClick={() => logout()}
-                >
-                  Logout
-                </Button>
-              </>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="text-white bg-transparent ">
+                    <User className="w-4 h-4 mr-2" />
+                    {user?.username}
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="bg-black/90 text-white border-gray-700">
+                  <DropdownMenuItem asChild>
+                    <Link to="/profile" className="flex items-center text-white">
+                      <Settings className="w-4 h-4 mr-2" />
+                      Profile
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link to="/favorites" className="flex items-center text-white">
+                      <Heart className="w-4 h-4 mr-2" />
+                      Favorites
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => logout()} className="flex items-center">
+                    <LogOut className="w-4 h-4 mr-2" />
+                    Logout
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             )}
           </div>
 
