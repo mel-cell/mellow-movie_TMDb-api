@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { tmdbService } from '@/lib/api/TMDbServices';
 import type { Movie, TVShow, Genre, SearchResult } from '@/lib/api/TMDbServices';
 import MediaCard from './MediaCard';
+import SimplePagination from '@/components/ui/SimplePagination';
 
 interface BrowseSectionProps {}
 
@@ -200,25 +201,11 @@ const BrowseSection: React.FC<BrowseSectionProps> = () => {
 
         {/* Pagination */}
         {totalPages > 1 && (
-          <div className="flex justify-center mt-8 space-x-2">
-            <Button
-              variant="outline"
-              onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-              disabled={currentPage === 1}
-              className="text-white border-white"
-            >
-              Previous
-            </Button>
-            <span className="text-white self-center">{currentPage} of {totalPages}</span>
-            <Button
-              variant="outline"
-              onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-              disabled={currentPage === totalPages}
-              className="text-white border-white"
-            >
-              Next
-            </Button>
-          </div>
+          <SimplePagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={setCurrentPage}
+          />
         )}
       </div>
     </div>
