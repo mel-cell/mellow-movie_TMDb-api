@@ -1,31 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
-import { supabase } from '../lib/supabase/supabaseClient';
-import { User } from '@supabase/supabase-js';
 import { Button } from './ui/button';
+import { useAuth } from '../contexts/AuthContext';
 
 const Header: React.FC = () => {
-  const [user, setUser] = useState<User | null>(null);
-
-  useEffect(() => {
-    const getUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      setUser(user);
-    };
-    getUser();
-
-    const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
-      setUser(session?.user ?? null);
-    });
-
-    return () => {
-      authListener.subscription.unsubscribe();
-    };
-  }, []);
-
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
-  };
+  const { user, logout } = useAuth();
 
   return (
     <header className="bg-gray-900 text-white p-4">
@@ -43,7 +22,7 @@ const Header: React.FC = () => {
               <Link to="/profile">
                 <Button variant="outline">Profile</Button>
               </Link>
-              <Button onClick={handleLogout} variant="destructive">Logout</Button>
+              <Button onClick={logout} variant="destructive">Logout</Button>
             </>
           ) : (
             <>
