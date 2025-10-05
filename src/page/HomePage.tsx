@@ -10,7 +10,6 @@ import ActorList from "@/components/actorlist";
 const HomePage: React.FC = () => {
   const [heroMovie, setHeroMovie] = useState<Movie | null>(null);
   const [heroTrailer, setHeroTrailer] = useState<Video | null>(null);
-  const [heroCast, setHeroCast] = useState<Credit[]>([]);
   const [theme, setTheme] = useState<"light" | "dark">("dark"); // default dark
 
   // 🔹 Sync theme with document
@@ -51,9 +50,6 @@ const HomePage: React.FC = () => {
 
           const videos = await tmdbService.getMovieVideos(randomMovie.id);
           setHeroTrailer(videos[0] || null);
-
-          const credits = await tmdbService.getMovieCredits(randomMovie.id);
-          setHeroCast(credits.cast.slice(0, 4));
         }
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -69,7 +65,6 @@ const HomePage: React.FC = () => {
       <HeroSection
         heroMovie={heroMovie}
         heroTrailer={heroTrailer}
-        heroCast={heroCast}
       />
 
       {/* Trending Section */}

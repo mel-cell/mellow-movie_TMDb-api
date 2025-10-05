@@ -14,8 +14,6 @@ import {
   Heart,
   Settings,
   LogOut,
-  Sun,
-  Moon,
   Languages,
 } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "../ui/sheet";
@@ -50,12 +48,10 @@ const Header: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<(Movie | TVShow)[]>([]);
   const [isSearching, setIsSearching] = useState(false);
-  const [searchParams, setSearchParams] = useSearchParams();
-  const [refresh, setRefresh] = useState(0);  
-  const [language, setLanguage] = useState<"en-US" | "id-ID">("en-US");
-  // New: theme state
-  const [theme, setTheme] = useState<"light" | "dark">("dark"); // default dark
-
+  const [, setSearchParams] = useSearchParams();
+  const [refresh, setRefresh] = useState(0);
+  const [language] = useState<"en-US" | "id-ID">("en-US");
+  
   const changeLanguage = (lng: string) => {
     i18n.changeLanguage(lng);
   };
@@ -71,27 +67,12 @@ const Header: React.FC = () => {
     tmdbService.setLanguage(language);
   }, [language]);
 
-  // Dark/Light mode effect
-  useEffect(() => {
-    if (theme === "dark") {
-      document.documentElement.classList.add("dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-    }
-  }, [theme]);
-
   // Persist openSearch state
   useEffect(() => {
     localStorage.setItem('openSearch', openSearch.toString());
   }, [openSearch]);
 
-  // Toggle theme function
-  const toggleTheme = () => {
-    const newTheme = theme === "dark" ? "light" : "dark";
-    setTheme(newTheme);
-    localStorage.setItem("theme", newTheme); // simpan theme
-    window.dispatchEvent(new Event("themeChange")); // kasih tau halaman lain
-  };
+
 
 
   // Realtime search

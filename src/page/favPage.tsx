@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Heart, X } from "lucide-react";
+import { X } from "lucide-react";
 import { tmdbService } from "@/lib/api/TMDbServices";
 import type { Movie, TVShow } from "@/lib/api/TMDbServices";
 import { useAuth } from "@/contexts/AuthContext";

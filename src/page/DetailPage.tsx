@@ -1,11 +1,11 @@
-import React, { useState, useEffect, useReducer } from "react";
+import React, { useEffect, useReducer } from "react";
 import { useParams, Link, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Play, ArrowLeft, Star, Heart, ChevronDown } from "lucide-react";
+import { ArrowLeft, Star, Heart, ChevronDown } from "lucide-react";
 import {
   tmdbService,
   addFavorite,

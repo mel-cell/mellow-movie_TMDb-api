@@ -44,7 +44,7 @@ const MainPage: React.FC = () => {
     <div className="min-h-screen bg-black text-white">
       {/* Hero Section */}
       {heroItem && (
-        <HeroSection heroMovie={heroItem} heroTrailer={null} heroCast={[]} />
+        <HeroSection heroMovie={heroItem} heroTrailer={null} />
       )}
 
       {/* Trending Section */}

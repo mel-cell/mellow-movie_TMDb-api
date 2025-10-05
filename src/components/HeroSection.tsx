@@ -3,18 +3,16 @@ import { Button } from "./ui/button";
 import { Dialog, DialogContent, DialogTrigger } from "./ui/dialog";
 import { Play, Plus, VolumeX, Volume } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import type { Movie, TVShow, Video, Credit } from "../lib/api/TMDbServices";
+import type { Movie, TVShow, Video } from "../lib/api/TMDbServices";
 
 interface HeroSectionProps {
   heroMovie: Movie | TVShow | null;
   heroTrailer: Video | null;
-  heroCast: Credit[];
 }
 
 const HeroSection: React.FC<HeroSectionProps> = ({
   heroMovie,
   heroTrailer,
-  heroCast,
 }) => {
   const { t } = useTranslation();
 

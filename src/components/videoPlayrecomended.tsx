@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import type { Video } from "../lib/api/TMDbServices";
 import { tmdbService } from "../lib/api/TMDbServices";
 import { Button } from "./ui/button";
-import { Play, ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 interface VideoPlayRecommendedProps {
   movieId: number; // ID of the movie or TV show to fetch videos for
