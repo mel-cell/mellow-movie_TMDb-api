@@ -1,28 +1,32 @@
-import { useState, useEffect } from "react";
-import { tmdbService } from "@/lib/api/TMDbServices";
-import type { TVShow, SearchResult } from "@/lib/api/TMDbServices";
+import React, { useState, useEffect } from "react";
+import { getPopularTVShows } from "../lib/api/TMDbServices";
+import SimplePagination from "../components/ui/SimplePagination";
+
+import type { TVShow } from "../lib/api/TMDbServices";
 
 const TvShowPage: React.FC = () => {
   const [tvShows, setTvShows] = useState<TVShow[]>([]);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true); // ✅ fix
+  const [error, setError] = useState<string | null>(null); // optional
 
   useEffect(() => {
-    const fetchTv = async () => {
+    const fetchTVShows = async () => {
+      setLoading(true);
+      setError(null);
       try {
-        setLoading(true);
-        const data: SearchResult<TVShow> = await tmdbService.discoverTV({ page });
+        const data = await getPopularTVShows(page);
         setTvShows(data.results);
         setTotalPages(data.total_pages);
       } catch (err) {
-        console.error("Error fetch TV Shows:", err);
+        console.error(err);
+        setError("Gagal memuat TV Shows");
       } finally {
         setLoading(false);
       }
     };
-
-    fetchTv();
+    fetchTVShows();
   }, [page]);
 
   return (
@@ -32,9 +36,11 @@ const TvShowPage: React.FC = () => {
         Discover TV Shows
       </h1>
 
-      {/* Loading State */}
+      {/* Loading & Error */}
       {loading ? (
         <p className="text-gray-400">Loading TV shows...</p>
+      ) : error ? (
+        <p className="text-red-500">{error}</p>
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
           {tvShows.map((show) => (
@@ -55,7 +61,7 @@ const TvShowPage: React.FC = () => {
                 </div>
               )}
 
-              {/* Info mirip Home */}
+              {/* Info */}
               <div className="p-3 bg-zinc-950/70 backdrop-blur-sm">
                 <h2 className="text-base font-semibold truncate text-gray-100">
                   {show.name}
@@ -73,7 +79,6 @@ const TvShowPage: React.FC = () => {
           ))}
         </div>
       )}
-      
 
       {/* Pagination */}
       <div className="flex justify-center items-center mt-8 space-x-4">
@@ -97,6 +102,12 @@ const TvShowPage: React.FC = () => {
           Next
         </button>
       </div>
+
+      <SimplePagination
+        currentPage={page}
+        totalPages={totalPages}
+        onPageChange={setPage}
+      />
     </div>
   );
 };

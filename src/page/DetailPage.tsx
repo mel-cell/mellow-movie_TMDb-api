@@ -4,9 +4,11 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Play, ArrowLeft, Star } from 'lucide-react';
-import { tmdbService } from '@/lib/api/TMDbServices';
-import type { MovieDetail, TVDetail, Video, Credit } from '@/lib/api/TMDbServices';
+import { Play, ArrowLeft, Star, Heart } from 'lucide-react';
+import { tmdbService, addFavorite, addMovieRating, addTVRating, getSimilarMovies, getSimilarTVShows } from '@/lib/api/TMDbServices';
+import type { MovieDetail, TVDetail, Video, Credit, Movie, TVShow } from '@/lib/api/TMDbServices';
+import { useAuth } from '@/contexts/AuthContext';
+import MediaCard from '@/components/MediaCard';
 
 const DetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -15,8 +17,15 @@ const DetailPage: React.FC = () => {
   const [details, setDetails] = useState<MovieDetail | TVDetail | null>(null);
   const [videos, setVideos] = useState<Video[]>([]);
   const [credits, setCredits] = useState<{ cast: Credit[] } | null>(null);
+  const [similar, setSimilar] = useState<(Movie | TVShow)[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  const { user, sessionId } = useAuth();
+  const [userRating, setUserRating] = useState<number | null>(null);
+  const [isFavorite, setIsFavorite] = useState(false);
+  const [ratingLoading, setRatingLoading] = useState(false);
+  const [favoriteLoading, setFavoriteLoading] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -30,24 +39,50 @@ const DetailPage: React.FC = () => {
         let detailsData: MovieDetail | TVDetail;
         let videosData: Video[];
         let creditsData: { cast: Credit[] };
+        let similarData: (Movie | TVShow)[];
 
         if (type === 'movie') {
-          [detailsData, videosData, creditsData] = await Promise.all([
+          [detailsData, videosData, creditsData, similarData] = await Promise.all([
             tmdbService.getMovieDetails(itemId),
             tmdbService.getMovieVideos(itemId),
             tmdbService.getMovieCredits(itemId),
+            getSimilarMovies(itemId).then(data => data.results.slice(0, 10)),
           ]);
         } else {
-          [detailsData, videosData, creditsData] = await Promise.all([
+          [detailsData, videosData, creditsData, similarData] = await Promise.all([
             tmdbService.getTVDetails(itemId),
             tmdbService.getTVVideos(itemId),
             tmdbService.getTVCredits(itemId),
+            getSimilarTVShows(itemId).then(data => data.results.slice(0, 10)),
           ]);
         }
 
         setDetails(detailsData);
         setVideos(videosData);
         setCredits(creditsData);
+        setSimilar(similarData);
+
+        // Fetch user rating and favorite status if logged in
+        if (user && sessionId) {
+          try {
+            const [ratedData, favoritesData] = await Promise.all([
+              type === 'movie' ? tmdbService.getRatedMovies(user.id.toString(), sessionId) : tmdbService.getRatedTVShows(user.id.toString(), sessionId),
+              tmdbService.getFavorites(user.id.toString(), sessionId)
+            ]);
+
+            const ratedItem = ratedData.results.find(item => item.id === itemId);
+            if (ratedItem) {
+              // Assuming rated items have rating, but TMDB rated list may not include rating value
+              // For now, set to null, as API doesn't provide the rating value in list
+              setUserRating(null); // TMDB doesn't provide rating value in rated list
+            }
+
+            const favoriteItem = favoritesData.results.find(item => item.id === itemId);
+            setIsFavorite(!!favoriteItem);
+          } catch (err) {
+            console.error('Error fetching user status:', err);
+          }
+        }
       } catch (err) {
         console.error('Error fetching details:', err);
         setError('Failed to load details. Please try again.');
@@ -58,6 +93,36 @@ const DetailPage: React.FC = () => {
 
     fetchData();
   }, [type, id]);
+
+  const handleRatingChange = async (newRating: number) => {
+    if (!user || !sessionId || !details) return;
+    setRatingLoading(true);
+    try {
+      if (type === 'movie') {
+        await addMovieRating(details.id, newRating, sessionId);
+      } else {
+        await addTVRating(details.id, newRating, sessionId);
+      }
+      setUserRating(newRating);
+    } catch (err) {
+      console.error('Error submitting rating:', err);
+    } finally {
+      setRatingLoading(false);
+    }
+  };
+
+  const handleFavoriteToggle = async () => {
+    if (!user || !sessionId || !details) return;
+    setFavoriteLoading(true);
+    try {
+      await addFavorite(user.id.toString(), sessionId, details.id, type, !isFavorite);
+      setIsFavorite(!isFavorite);
+    } catch (err) {
+      console.error('Error toggling favorite:', err);
+    } finally {
+      setFavoriteLoading(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -194,6 +259,44 @@ const DetailPage: React.FC = () => {
               <p className="text-gray-300 leading-relaxed">{details.overview}</p>
             </div>
 
+            {/* Rating and Favorite */}
+            {user && sessionId && (
+              <div className="mb-8 flex items-center gap-6">
+                <div className="flex items-center gap-2">
+                  <Star className="w-5 h-5 text-yellow-500" />
+                  <label htmlFor="rating" className="text-white font-semibold">
+                    Your Rating:
+                  </label>
+                  <select
+                    id="rating"
+                    value={userRating ?? ''}
+                    onChange={(e) => handleRatingChange(Number(e.target.value))}
+                    disabled={ratingLoading}
+                    className="bg-gray-800 text-white rounded px-3 py-1 border border-gray-600"
+                  >
+                    <option value="">Rate this {type}</option>
+                    {[...Array(10)].map((_, i) => (
+                      <option key={i + 1} value={i + 1}>
+                        {i + 1}
+                      </option>
+                    ))}
+                  </select>
+                  {userRating && (
+                    <span className="text-yellow-500 font-semibold">{userRating}/10</span>
+                  )}
+                </div>
+                <Button
+                  variant={isFavorite ? 'destructive' : 'default'}
+                  onClick={handleFavoriteToggle}
+                  disabled={favoriteLoading}
+                  className="flex items-center gap-2"
+                >
+                  <Heart className={`w-4 h-4 ${isFavorite ? 'fill-current' : ''}`} />
+                  {isFavorite ? 'Remove from Favorites' : 'Add to Favorites'}
+                </Button>
+              </div>
+            )}
+
             {/* Videos */}
             {videos.length > 0 && (
               <div className="mb-8">
@@ -292,6 +395,20 @@ const DetailPage: React.FC = () => {
                 </div>
               )}
             </div>
+
+            {/* Similar Movies/TV Shows */}
+            {similar.length > 0 && (
+              <div className="mb-8">
+                <h2 className="text-2xl font-semibold mb-4">
+                  Similar {type === 'movie' ? 'Movies' : 'TV Shows'}
+                </h2>
+                <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                  {similar.map((item) => (
+                    <MediaCard key={item.id} item={item} />
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>

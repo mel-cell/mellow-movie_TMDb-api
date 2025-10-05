@@ -3,6 +3,8 @@
 import React, { useEffect, useState } from 'react';
 import type { Video } from '../lib/api/TMDbServices';
 import { tmdbService } from '../lib/api/TMDbServices';
+import { Button } from './ui/button';
+import { Play, ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface VideoPlayRecommendedProps {
   movieId: number; // ID of the movie or TV show to fetch videos for
@@ -26,9 +28,13 @@ const VideoPlayRecommended: React.FC<VideoPlayRecommendedProps> = ({ movieId, is
         } else {
           videoResults = await tmdbService.getMovieVideos(movieId);
         }
-        setVideos(videoResults);
-        if (videoResults.length > 0) {
-          setSelectedVideo(videoResults[0]);
+        // Filter for trailers and teasers only
+        const filteredVideos = videoResults.filter(video =>
+          video.type === 'Trailer' || video.type === 'Teaser'
+        );
+        setVideos(filteredVideos);
+        if (filteredVideos.length > 0) {
+          setSelectedVideo(filteredVideos[0]);
         }
       } catch (err) {
         setError('Failed to load videos.');
@@ -40,33 +46,78 @@ const VideoPlayRecommended: React.FC<VideoPlayRecommendedProps> = ({ movieId, is
     fetchVideos();
   }, [movieId, isTVShow]);
 
+  const nextVideo = () => {
+    if (videos.length > 1) {
+      const currentIndex = videos.findIndex(v => v.id === selectedVideo?.id);
+      const nextIndex = (currentIndex + 1) % videos.length;
+      setSelectedVideo(videos[nextIndex]);
+    }
+  };
+
+  const prevVideo = () => {
+    if (videos.length > 1) {
+      const currentIndex = videos.findIndex(v => v.id === selectedVideo?.id);
+      const prevIndex = currentIndex === 0 ? videos.length - 1 : currentIndex - 1;
+      setSelectedVideo(videos[prevIndex]);
+    }
+  };
+
   if (loading) {
-    return <div>Loading video...</div>;
+    return (
+      <section className="py-8">
+        <div className="max-w-screen-2xl mx-auto px-4">
+          <h2 className="text-2xl font-semibold text-white mb-6">Videos</h2>
+          <div className="aspect-video bg-gray-800 rounded-lg animate-pulse"></div>
+        </div>
+      </section>
+    );
   }
 
-  if (error) {
-    return <div>{error}</div>;
+  if (error || !selectedVideo) {
+    return null; // Don't show anything if no videos
   }
 
-  if (!selectedVideo) {
-    return <div>No videos available.</div>;
-  }
-
-  const videoUrl = `https://www.youtube.com/embed/${selectedVideo.key}`;
+  const videoUrl = `https://www.youtube.com/embed/${selectedVideo.key}?rel=0`;
 
   return (
-    <div className="video-play-recommended">
-      <div className="video-player-container" style={{ position: 'relative', paddingBottom: '56.25%', height: 0 }}>
-        <iframe
-          src={videoUrl}
-          title={selectedVideo.name}
-          frameBorder="0"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          allowFullScreen
-          style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%'  }}
-        />
+    <section className="py-8 bg-black">
+      <div className="max-w-screen-2xl mx-auto px-4">
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-2xl font-semibold text-white">Videos</h2>
+          {videos.length > 1 && (
+            <div className="flex space-x-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={prevVideo}
+                className="text-white border-gray-600 hover:bg-gray-800"
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={nextVideo}
+                className="text-white border-gray-600 hover:bg-gray-800"
+              >
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+            </div>
+          )}
+        </div>
+
+        <div className="relative aspect-video bg-black rounded-lg overflow-hidden shadow-2xl">
+          <iframe
+            src={videoUrl}
+            title={selectedVideo.name}
+            frameBorder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+            className="w-full h-full"
+          />
+        </div>
       </div>
-    </div>
+    </section>
   );
 };
 

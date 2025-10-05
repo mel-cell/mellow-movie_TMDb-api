@@ -1,16 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Slider } from '@/components/ui/slider';
-import { Badge } from '@/components/ui/badge';
-import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Search, Play, Plus } from 'lucide-react';
 import { tmdbService } from '@/lib/api/TMDbServices';
-import SearchBar from '@/components/SearchBar';
 import type { Movie, TVShow, Genre, SearchResult } from '@/lib/api/TMDbServices';
+import MediaCard from './MediaCard';
+import SimplePagination from '@/components/ui/SimplePagination';
 
 interface BrowseSectionProps {}
 
@@ -100,11 +96,6 @@ const BrowseSection: React.FC<BrowseSectionProps> = () => {
     );
   };
 
-  const handleSearch = () => {
-    setSearchQuery(searchInput.trim());
-    setCurrentPage(1);
-  };
-
   const clearFilters = () => {
     setSelectedGenres([]);
     setYear(null);
@@ -120,31 +111,46 @@ const BrowseSection: React.FC<BrowseSectionProps> = () => {
   return (
     <div className="py-8 bg-black">
       <div className="max-w-screen-2xl mx-auto px-4">
-
-        {/* Search Bar */}
-        <SearchBar
-          searchQuery={searchInput}
-          setSearchQuery={setSearchInput}
-          onSearch={handleSearch}
-          isSearching={loading}
-        />
-
         {/* Category Tabs */}
-        <Tabs value={category} onValueChange={(value) => setCategory(value as 'movie' | 'tv' | 'original')} className="mb-6">
+        <Tabs
+          value={category}
+          onValueChange={(value) =>
+            setCategory(value as "movie" | "tv" | "original")
+          }
+          className="mb-6"
+        >
           <TabsList className="grid w-full grid-cols-3 bg-gray-800">
-            <TabsTrigger value="movie" className="data-[state=active]:bg-red-600">Movies</TabsTrigger>
-            <TabsTrigger value="tv" className="data-[state=active]:bg-red-600">TV Shows</TabsTrigger>
-            <TabsTrigger value="original" className="data-[state=active]:bg-red-600">Original Series</TabsTrigger>
+            <TabsTrigger
+              value="movie"
+              className="data-[state=active]:bg-red-600"
+            >
+              Movies
+            </TabsTrigger>
+            <TabsTrigger value="tv" className="data-[state=active]:bg-red-600">
+              TV Shows
+            </TabsTrigger>
+            <TabsTrigger
+              value="original"
+              className="data-[state=active]:bg-red-600"
+            >
+              Original Series
+            </TabsTrigger>
           </TabsList>
         </Tabs>
 
         {/* Horizontal Genre Buttons */}
         <div className="flex overflow-x-auto gap-2 mb-6 pb-2">
-          {genres.map(genre => (
+          {genres.map((genre) => (
             <Button
               key={genre.id}
-              variant={selectedGenres.includes(genre.id) ? 'default' : 'outline'}
-              className={`rounded-full px-4 py-2 ${selectedGenres.includes(genre.id) ? 'bg-red-600 hover:bg-red-700 text-white' : 'bg-gray-800 text-gray-300 border-gray-600 hover:bg-gray-700'}`}
+              variant={
+                selectedGenres.includes(genre.id) ? "default" : "outline"
+              }
+              className={`rounded-full px-4 py-2 ${
+                selectedGenres.includes(genre.id)
+                  ? "bg-red-600 hover:bg-red-700 text-white"
+                  : "bg-gray-800 text-gray-300 border-gray-600 hover:bg-gray-700"
+              }`}
               onClick={() => toggleGenre(genre.id)}
             >
               {genre.name}
@@ -165,15 +171,25 @@ const BrowseSection: React.FC<BrowseSectionProps> = () => {
                 <SelectItem value="title.desc">Z-A</SelectItem>
               </SelectContent>
             </Select>
-            <Select value={year?.toString() || 'all'} onValueChange={(value) => setYear(value === 'all' ? null : parseInt(value))}>
+            <Select
+              value={year?.toString() || "all"}
+              onValueChange={(value) =>
+                setYear(value === "all" ? null : parseInt(value))
+              }
+            >
               <SelectTrigger className="w-32 bg-gray-800 border-gray-600 text-white rounded-full">
                 <SelectValue placeholder="Year" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Years</SelectItem>
-                {years.slice(-10).reverse().map(y => (
-                  <SelectItem key={y} value={y.toString()}>{y}</SelectItem>
-                ))}
+                {years
+                  .slice(-10)
+                  .reverse()
+                  .map((y) => (
+                    <SelectItem key={y} value={y.toString()}>
+                      {y}
+                    </SelectItem>
+                  ))}
               </SelectContent>
             </Select>
           </div>
@@ -186,11 +202,21 @@ const BrowseSection: React.FC<BrowseSectionProps> = () => {
               max={10}
               step={0.5}
               className="w-48"
+              // ✅ Tambahan styling untuk track dan range supaya terlihat
+              style={{
+                background: "linear-gradient(to right, #dc2626, #f87171)",
+                height: "6px",
+                borderRadius: "9999px",
+              }}
             />
-            <span className="text-white text-sm">{minRating.toFixed(1)}+ </span>
+            <span className="text-white text-sm">{minRating.toFixed(1)}+</span>
           </div>
 
-          <Button variant="outline" onClick={clearFilters} className="text-white border-white rounded-full px-4 py-2">
+          <Button
+            variant="outline"
+            onClick={clearFilters}
+            className="text-white border-white rounded-full px-4 py-2"
+          >
             Clear
           </Button>
         </div>
@@ -208,79 +234,23 @@ const BrowseSection: React.FC<BrowseSectionProps> = () => {
           </div>
         ) : results.length > 0 ? (
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-            {results.map((item) => {
-              const title = 'title' in item ? item.title : item.name;
-              const poster = item.poster_path;
-              const type = 'title' in item ? 'Movie' : 'TV Show';
-              const voteAverage = item.vote_average;
-            return (
-              <Link
-                key={item.id}
-                to={`/${type === 'Movie' ? 'movie' : 'tv'}/${item.id}`}
-                className="w-full group cursor-pointer"
-              >
-                <div className="relative overflow-hidden rounded-lg">
-                  {poster ? (
-                    <img
-                      src={poster}
-                      alt={title}
-                      className="w-full h-72 object-cover transition-transform duration-300 group-hover:scale-105"
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).src = '/vite.svg';
-                        (e.target as HTMLImageElement).classList.add('opacity-50');
-                      }}
-                    />
-                  ) : (
-                    <div className="w-full h-72 bg-gray-700 rounded-lg flex items-center justify-center">
-                      <span className="text-gray-500 text-sm">No Image</span>
-                    </div>
-                  )}
-                  {/* Hover overlay */}
-                  <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 transition-all duration-300 flex items-end p-4">
-                    <div className="text-white text-base line-clamp-2 w-full">
-                      {title}
-                      <div className="text-gray-300 text-sm mt-1">{type}</div>
-                    </div>
-                  </div>
-                </div>
-                {/* Title and Rating */}
-                <div className="mt-4">
-                  <p className="text-white text-lg font-medium line-clamp-1 group-hover:text-gray-300 transition-colors">
-                    {title}
-                  </p>
-                  <p className="text-gray-400 text-base mt-2">
-                    {voteAverage ? `${Math.round(voteAverage * 10)}%` : 'N/A'}
-                  </p>
-                </div>
-              </Link>
-            );
-            })}
+            {results.map((item) => (
+              <MediaCard key={item.id} item={item} />
+            ))}
           </div>
         ) : (
-          <p className="text-gray-400 text-center py-8">No results found. Try adjusting filters.</p>
+          <p className="text-gray-400 text-center py-8">
+            No results found. Try adjusting filters.
+          </p>
         )}
 
         {/* Pagination */}
         {totalPages > 1 && (
-          <div className="flex justify-center mt-8 space-x-2">
-            <Button
-              variant="outline"
-              onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-              disabled={currentPage === 1}
-              className="text-white border-white"
-            >
-              Previous
-            </Button>
-            <span className="text-white self-center">{currentPage} of {totalPages}</span>
-            <Button
-              variant="outline"
-              onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-              disabled={currentPage === totalPages}
-              className="text-white border-white"
-            >
-              Next
-            </Button>
-          </div>
+          <SimplePagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={setCurrentPage}
+          />
         )}
       </div>
     </div>

@@ -11,6 +11,9 @@ import {
   Search,
   User,
   Menu,
+  Heart,
+  Settings,
+  LogOut,
 } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "../ui/sheet";
 import {
@@ -21,12 +24,20 @@ import {
   CommandItem,
   CommandList,
 } from "../ui/command";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "../ui/dropdown-menu";
 import { tmdbService } from "../../lib/api/TMDbServices";
 import type { Movie, TVShow } from "../../lib/api/TMDbServices";
+import { useAuth } from "../../contexts/AuthContext";
 
 const Header: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false);
-  const [isLoggedIn] = useState(false);
+  const { user, logout } = useAuth();
+  const isLoggedIn = !!user;
   const [openSearch, setOpenSearch] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<(Movie | TVShow)[]>([]);
@@ -56,7 +67,7 @@ const Header: React.FC = () => {
     } else {
       document.documentElement.classList.remove("dark");
     }
-  }, [theme]);
+  }, [theme]);  
 
   // Toggle theme function
   const toggleTheme = () => {
@@ -253,7 +264,7 @@ const Header: React.FC = () => {
             <Button
               variant="ghost"
               size="icon"
-              className="text-white"
+              className="text-white bg-transparent hover:bg-white/10"
               onClick={() => setOpenSearch(true)}
             >
               <Search className="h-5 w-5" />
@@ -267,16 +278,39 @@ const Header: React.FC = () => {
                     {language === "id-ID" ? "Masuk" : "Login"}
                   </Button>
                 </Link>
-                <Link to="/signup">
+                <Link to="https://www.themoviedb.org/signup" target="_blank" rel="noopener noreferrer">
                   <Button className="bg-red-600 hover:bg-red-700 text-white">
                     {language === "id-ID" ? "Daftar" : "Signup"}
                   </Button>
                 </Link>
               </div>
             ) : (
-              <Button variant="ghost" size="icon" className="text-white">
-                <User className="h-5 w-5" />
-              </Button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="text-white bg-transparent ">
+                    <User className="w-4 h-4 mr-2" />
+                    {user?.username}
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="bg-black/90 text-white border-gray-700">
+                  <DropdownMenuItem asChild>
+                    <Link to="/profile" className="flex items-center text-white">
+                      <Settings className="w-4 h-4 mr-2" />
+                      Profile
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link to="/favorites" className="flex items-center text-white">
+                      <Heart className="w-4 h-4 mr-2" />
+                      Favorites
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => logout()} className="flex items-center">
+                    <LogOut className="w-4 h-4 mr-2" />
+                    Logout
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             )}
           </div>
 

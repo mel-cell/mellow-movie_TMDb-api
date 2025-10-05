@@ -5,6 +5,8 @@ import {
   getMoviesByGenre,
 } from "../lib/api/TMDbServices";
 import type { Movie } from "../lib/api/TMDbServices";
+import MediaCard from "../components/MediaCard";
+import SimplePagination from "../components/ui/SimplePagination";
 
 const MoviePage: React.FC = () => {
   const [movies, setMovies] = useState<Movie[]>([]);
@@ -35,12 +37,18 @@ const MoviePage: React.FC = () => {
       try {
         let data;
         if (selectedGenre) {
-          data = await getMoviesByGenre(selectedGenre,);
+          data = await getMoviesByGenre(selectedGenre, page);
+          setMovies(data.results);
+          setTotalPages(data.total_pages);
         } else {
-          data = await getPopularMovies(page);
+          // Load multiple pages for popular movies to show more
+          const pagesToLoad = [page, page + 1, page + 2].filter(p => p <= 500); // TMDB max 500 pages
+          const promises = pagesToLoad.map(p => getPopularMovies(p));
+          const results = await Promise.all(promises);
+          const allMovies = results.flatMap(result => result.results);
+          setMovies(allMovies);
+          setTotalPages(results[0].total_pages);
         }
-        setMovies(data.results);
-        setTotalPages(data.total_pages);
       } catch (err: any) {
         console.error(err);
         setError("Gagal memuat data film");
@@ -50,15 +58,6 @@ const MoviePage: React.FC = () => {
     };
     fetchMovies();
   }, [page, selectedGenre]);
-
-  // 🔹 Tombol pagination
-  const handlePrev = () => {
-    if (page > 1) setPage((prev) => prev - 1);
-  };
-
-  const handleNext = () => {
-    if (page < totalPages) setPage((prev) => prev + 1);
-  };
 
   // 🔹 Loading spinner
   if (loading)
@@ -113,54 +112,16 @@ const MoviePage: React.FC = () => {
         {/* 🔹 GRID MOVIES */}
         <div className="grid gap-6 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
           {movies.map((movie) => (
-            <div
-              key={movie.id}
-              className="relative group rounded-xl overflow-hidden cursor-pointer hover:scale-105 transition-transform duration-300"
-            >
-              <img
-                src={movie.poster_path || ""}
-                alt={movie.title}
-                className="w-full h-full object-cover"
-              />
-              {/* Overlay info */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-3">
-                <h2 className="text-base font-semibold">{movie.title}</h2>
-                <p className="text-sm text-gray-300">⭐ {movie.vote_average}</p>
-              </div>
-            </div>
+            <MediaCard key={movie.id} item={movie} />
           ))}
         </div>
 
         {/* 🔹 PAGINATION */}
-        <div className="flex justify-center items-center gap-6 mt-10">
-          <button
-            onClick={handlePrev}
-            disabled={page === 1}
-            className={`px-5 py-2 rounded-lg font-semibold transition ${
-              page === 1
-                ? "bg-gray-700 text-gray-400 cursor-not-allowed"
-                : "bg-red-600 hover:bg-red-700 text-white"
-            }`}
-          >
-            Prev
-          </button>
-
-          <span className="text-lg">
-            Page {page} / {totalPages}
-          </span>
-
-          <button
-            onClick={handleNext}
-            disabled={page === totalPages}
-            className={`px-5 py-2 rounded-lg font-semibold transition ${
-              page === totalPages
-                ? "bg-gray-700 text-gray-400 cursor-not-allowed"
-                : "bg-red-600 hover:bg-red-700 text-white"
-            }`}
-          >
-            Next
-          </button>
-        </div>
+        <SimplePagination
+          currentPage={page}
+          totalPages={totalPages}
+          onPageChange={setPage}
+        />
       </div>
     </div>
   );

@@ -47,7 +47,9 @@ const ActorsPage: React.FC = () => {
   }, []);
 
   return (
-    <section className="py-16 mb-12 bg-gradient-to-b from-black via-zinc-900 to-black min-h-screen">
+    <section className=" py-16 mb-12 bg-gradient-to-b from-black via-zinc-900 to-black min-h-screen">
+      <div className="max-w-7xl f-full mx-auto">
+
       {/* Header */}
       <div className="flex justify-between items-center mb-10 px-8">
         <h2 className="text-3xl font-bold text-white tracking-tight">
@@ -119,6 +121,7 @@ const ActorsPage: React.FC = () => {
           </p>
         )}
       </div>
+    </div>
     </section>
   );
 };
