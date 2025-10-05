@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { useSearchParams } from 'react-router-dom';
-import { tmdbService, Movie, TVShow } from '../lib/api/TMDbServices';
+import { tmdbService,type Movie,type TVShow } from '../lib/api/TMDbServices';
 
 const SearchSection: React.FC = () => {
   const [searchParams] = useSearchParams();

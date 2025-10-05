@@ -37,9 +37,15 @@ const BrowseSection: React.FC<BrowseSectionProps> = () => {
   const [results, setResults] = useState<(Movie | TVShow)[]>([]);
   const [totalPages, setTotalPages] = useState(1);
   const [currentPage, setCurrentPage] = useState(1);
+<<<<<<< HEAD
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchInput, setSearchInput] = useState("");
+=======
+  const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchInput, setSearchInput] = useState('');
+>>>>>>> tegar
 
   useEffect(() => {
     const fetchGenres = async () => {
@@ -144,12 +150,18 @@ const BrowseSection: React.FC<BrowseSectionProps> = () => {
         {/* Category Tabs */}
         <Tabs
           value={category}
+<<<<<<< HEAD
           onValueChange={(value) => {
             setCategory(value as "movie" | "tv" | "original");
             setCurrentPage(1);
             setSearchQuery("");
             setSearchInput("");
           }}
+=======
+          onValueChange={(value) =>
+            setCategory(value as "movie" | "tv" | "original")
+          }
+>>>>>>> tegar
           className="mb-6"
         >
           <TabsList className="grid w-full grid-cols-3 bg-gray-800">
@@ -235,13 +247,21 @@ const BrowseSection: React.FC<BrowseSectionProps> = () => {
                 setYear(value === "all" ? null : parseInt(value))
               }
             >
+<<<<<<< HEAD
               <SelectTrigger className="w-full md:w-32 bg-gray-800 border-gray-600 text-white rounded-full">
+=======
+              <SelectTrigger className="w-32 bg-gray-800 border-gray-600 text-white rounded-full">
+>>>>>>> tegar
                 <SelectValue placeholder="Year" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Years</SelectItem>
                 {years
+<<<<<<< HEAD
                   .slice(-20)
+=======
+                  .slice(-10)
+>>>>>>> tegar
                   .reverse()
                   .map((y) => (
                     <SelectItem key={y} value={y.toString()}>
@@ -252,6 +272,7 @@ const BrowseSection: React.FC<BrowseSectionProps> = () => {
             </Select>
           </div>
 
+<<<<<<< HEAD
           <div className="flex items-center space-x-4 w-full md:w-auto justify-between md:justify-end">
             <div className="flex items-center space-x-4">
               <span className="text-white text-sm">Rating</span>
@@ -273,6 +294,33 @@ const BrowseSection: React.FC<BrowseSectionProps> = () => {
               Clear
             </Button>
           </div>
+=======
+          <div className="flex items-center space-x-4">
+            <span className="text-white text-sm">Rating</span>
+            <Slider
+              value={[minRating]}
+              onValueChange={(value) => setMinRating(value[0])}
+              max={10}
+              step={0.5}
+              className="w-48"
+              // ✅ Tambahan styling untuk track dan range supaya terlihat
+              style={{
+                background: "linear-gradient(to right, #dc2626, #f87171)",
+                height: "6px",
+                borderRadius: "9999px",
+              }}
+            />
+            <span className="text-white text-sm">{minRating.toFixed(1)}+</span>
+          </div>
+
+          <Button
+            variant="outline"
+            onClick={clearFilters}
+            className="text-white border-white rounded-full px-4 py-2"
+          >
+            Clear
+          </Button>
+>>>>>>> tegar
         </div>
 
         {/* Results */}
@@ -299,7 +347,11 @@ const BrowseSection: React.FC<BrowseSectionProps> = () => {
           </div>
         ) : (
           <p className="text-gray-400 text-center py-8">
+<<<<<<< HEAD
             No results found. Try adjusting filters or search query.
+=======
+            No results found. Try adjusting filters.
+>>>>>>> tegar
           </p>
         )}
 
