@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '../../components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui/card';
 import { tmdbService } from '../../lib/api/TMDbServices';
@@ -11,19 +11,19 @@ const Login: React.FC = () => {
   const { t } = useTranslation();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { login } = useAuth();
 
   // Check for approved request token in URL params
   React.useEffect(() => {
-    const requestToken = searchParams.get('request_token');
-    const approved = searchParams.get('approved');
+    const urlParams = new URLSearchParams(window.location.search);
+    const requestToken = urlParams.get('request_token');
+    const approved = urlParams.get('approved');
 
     if (requestToken && approved === 'true') {
       handleApprovedToken(requestToken);
     }
-  }, [searchParams]);
+  }, []);
 
   const handleApprovedToken = async (requestToken: string) => {
     try {

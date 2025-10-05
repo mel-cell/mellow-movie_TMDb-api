@@ -22,10 +22,6 @@ const TrendingSection: React.FC = () => {
   const [items, setItems] = useState<MediaItem[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const getItemTitle = (item: MediaItem) =>
-    "title" in item ? item.title : item.name;
-  const getItemType = (item: MediaItem) =>
-    "title" in item ? "Movie" : "TV Show";
   const categoryNames = ["Trending", "Popular", "Now Playing"];
 
   const handleCategoryChange = useCallback((category: number) => {

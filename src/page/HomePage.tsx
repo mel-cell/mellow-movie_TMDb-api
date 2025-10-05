@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { tmdbService } from "@/lib/api/TMDbServices";
-import type { Movie, Video, Credit } from "@/lib/api/TMDbServices";
+import type { Movie, Video } from "@/lib/api/TMDbServices";
 import HeroSection from "@/components/HeroSection";
 import TrendingSection from "@/components/TrendingSection";
 import BrowseSection from "@/components/BrowseSection";

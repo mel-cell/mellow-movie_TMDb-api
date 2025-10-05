@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { tmdbService } from "@/lib/api/TMDbServices";
 import type { Movie, TVShow } from "@/lib/api/TMDbServices";
 import HeroSection from "@/components/HeroSection";
-import TrendingSection from "@/components/TrendingSection";
 import MediaCard from "@/components/MediaCard";
 
 const MainPage: React.FC = () => {
