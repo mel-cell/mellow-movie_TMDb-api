@@ -1,17 +1,20 @@
-'use client';
+"use client";
 
-import React, { useEffect, useState } from 'react';
-import type { Video } from '../lib/api/TMDbServices';
-import { tmdbService } from '../lib/api/TMDbServices';
-import { Button } from './ui/button';
-import { Play, ChevronLeft, ChevronRight } from 'lucide-react';
+import React, { useEffect, useState } from "react";
+import type { Video } from "../lib/api/TMDbServices";
+import { tmdbService } from "../lib/api/TMDbServices";
+import { Button } from "./ui/button";
+import { Play, ChevronLeft, ChevronRight } from "lucide-react";
 
 interface VideoPlayRecommendedProps {
   movieId: number; // ID of the movie or TV show to fetch videos for
   isTVShow?: boolean; // Flag to indicate if the ID is for a TV show
 }
 
-const VideoPlayRecommended: React.FC<VideoPlayRecommendedProps> = ({ movieId, isTVShow = false }) => {
+const VideoPlayRecommended: React.FC<VideoPlayRecommendedProps> = ({
+  movieId,
+  isTVShow = false,
+}) => {
   const [videos, setVideos] = useState<Video[]>([]);
   const [selectedVideo, setSelectedVideo] = useState<Video | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
@@ -29,15 +32,15 @@ const VideoPlayRecommended: React.FC<VideoPlayRecommendedProps> = ({ movieId, is
           videoResults = await tmdbService.getMovieVideos(movieId);
         }
         // Filter for trailers and teasers only
-        const filteredVideos = videoResults.filter(video =>
-          video.type === 'Trailer' || video.type === 'Teaser'
+        const filteredVideos = videoResults.filter(
+          (video) => video.type === "Trailer" || video.type === "Teaser"
         );
         setVideos(filteredVideos);
         if (filteredVideos.length > 0) {
           setSelectedVideo(filteredVideos[0]);
         }
       } catch (err) {
-        setError('Failed to load videos.');
+        setError("Failed to load videos.");
       } finally {
         setLoading(false);
       }
@@ -48,7 +51,7 @@ const VideoPlayRecommended: React.FC<VideoPlayRecommendedProps> = ({ movieId, is
 
   const nextVideo = () => {
     if (videos.length > 1) {
-      const currentIndex = videos.findIndex(v => v.id === selectedVideo?.id);
+      const currentIndex = videos.findIndex((v) => v.id === selectedVideo?.id);
       const nextIndex = (currentIndex + 1) % videos.length;
       setSelectedVideo(videos[nextIndex]);
     }
@@ -56,8 +59,9 @@ const VideoPlayRecommended: React.FC<VideoPlayRecommendedProps> = ({ movieId, is
 
   const prevVideo = () => {
     if (videos.length > 1) {
-      const currentIndex = videos.findIndex(v => v.id === selectedVideo?.id);
-      const prevIndex = currentIndex === 0 ? videos.length - 1 : currentIndex - 1;
+      const currentIndex = videos.findIndex((v) => v.id === selectedVideo?.id);
+      const prevIndex =
+        currentIndex === 0 ? videos.length - 1 : currentIndex - 1;
       setSelectedVideo(videos[prevIndex]);
     }
   };

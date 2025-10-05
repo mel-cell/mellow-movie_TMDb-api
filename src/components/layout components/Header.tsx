@@ -14,6 +14,9 @@ import {
   Heart,
   Settings,
   LogOut,
+  Sun,
+  Moon,
+  Languages,
 } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "../ui/sheet";
 import {
@@ -33,8 +36,10 @@ import {
 import { tmdbService } from "../../lib/api/TMDbServices";
 import type { Movie, TVShow } from "../../lib/api/TMDbServices";
 import { useAuth } from "../../contexts/AuthContext";
+import { useTranslation } from "react-i18next";
 
 const Header: React.FC = () => {
+  const { t, i18n } = useTranslation();
   const [isScrolled, setIsScrolled] = useState(false);
   const { user, logout } = useAuth();
   const isLoggedIn = !!user;
@@ -44,6 +49,10 @@ const Header: React.FC = () => {
   const [isSearching, setIsSearching] = useState(false);
   const [searchParams, setSearchParams] = useSearchParams();
   const [refresh, setRefresh] = useState(0);
+
+  const changeLanguage = (lng: string) => {
+    i18n.changeLanguage(lng);
+  };
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 10);
@@ -86,7 +95,7 @@ const Header: React.FC = () => {
       <div className="bg-black/95 backdrop-blur-xl border border-gray-700/50 shadow-2xl rounded-xl w-full max-w-2xl mx-4 max-h-[70vh] overflow-hidden">
         <CommandDialog key={refresh} open={openSearch} onOpenChange={setOpenSearch}>
           <CommandInput
-            placeholder="Search movies, TV shows..."
+            placeholder={t('nav.search')}
             value={searchQuery}
             onValueChange={(value) => setSearchQuery(value)}
             className="border-gray-600 bg-gray-800/50 text-white placeholder:text-gray-400 focus:border-red-500 focus:ring-red-500/20 h-12"
@@ -95,11 +104,11 @@ const Header: React.FC = () => {
             {isSearching ? (
               <div className="flex items-center justify-center py-8">
                 <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-red-600"></div>
-                <span className="ml-2 text-gray-400">Searching...</span>
+                <span className="ml-2 text-gray-400">{t('nav.searching')}</span>
               </div>
             ) : searchResults.length === 0 && searchQuery.trim() ? (
               <CommandEmpty className="text-gray-400 py-8 text-center">
-                No results found for "{searchQuery}"
+                {t('nav.noResults')} "{searchQuery}"
               </CommandEmpty>
             ) : (
               <CommandGroup heading="Search Results" className="text-gray-300">
@@ -179,40 +188,58 @@ const Header: React.FC = () => {
               className="flex items-center gap-1 text-white hover:text-gray-300"
             >
               <Home className="h-5 w-5" />
-              Home
+              {t('nav.home')}
             </Link>
             <Link
               to="/movie"
               className="flex items-center gap-1 text-white hover:text-gray-300"
             >
               <Film className="h-5 w-5" />
-              Movies
+              {t('nav.movies')}
             </Link>
             <Link
               to="/tv"
               className="flex items-center gap-1 text-white hover:text-gray-300"
             >
               <Tv className="h-5 w-5" />
-              TV Shows
+              {t('nav.tvShows')}
             </Link>
             <Link
               to="/trending"
               className="flex items-center gap-1 text-white hover:text-gray-300"
             >
               <TrendingUp className="h-5 w-5" />
-              Trending
+              {t('nav.trending')}
             </Link>
             <Link
               to="/actors"
               className="flex items-center gap-1 text-white hover:text-gray-300"
             >
               <Users className="h-5 w-5" />
-              Actors
+              {t('nav.actors')}
             </Link>
           </nav>
 
           {/* Right side */}
           <div className="flex items-center space-x-4">
+
+            {/* Language Switcher */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon" className="text-white bg-transparent hover:bg-white/10">
+                  <Languages className="h-5 w-5" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="bg-black/90 text-white border-gray-700">
+                <DropdownMenuItem onClick={() => changeLanguage('en')} className="flex items-center">
+                  {t('language.english')}
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => changeLanguage('id')} className="flex items-center">
+                  {t('language.indonesian')}
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
             <Button
               variant="ghost"
               size="icon"
@@ -225,12 +252,12 @@ const Header: React.FC = () => {
               <div className="flex space-x-2">
                 <Link to="/login">
                   <Button variant="outline" className="text-white border-white">
-                    Login
+                    {t('nav.login')}
                   </Button>
                 </Link>
                 <Link to="https://www.themoviedb.org/signup" target="_blank" rel="noopener noreferrer">
                   <Button className="bg-red-600 hover:bg-red-700 text-white">
-                    Signup
+                    {t('nav.signup')}
                   </Button>
                 </Link>
               </div>
@@ -246,18 +273,18 @@ const Header: React.FC = () => {
                   <DropdownMenuItem asChild>
                     <Link to="/profile" className="flex items-center text-white">
                       <Settings className="w-4 h-4 mr-2" />
-                      Profile
+                      {t('nav.profile')}
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
                     <Link to="/favorites" className="flex items-center text-white">
                       <Heart className="w-4 h-4 mr-2" />
-                      Favorites
+                      {t('nav.favorites')}
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => logout()} className="flex items-center">
                     <LogOut className="w-4 h-4 mr-2" />
-                    Logout
+                    {t('nav.logout')}
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -280,11 +307,11 @@ const Header: React.FC = () => {
               className="bg-black/90 text-white border-none"
             >
               <div className="flex flex-col space-y-4 mt-8">
-                <Link to="/">Home</Link>
-                <Link to="/movie">Movies</Link>
-                <Link to="/tv">TV Shows</Link>
-                <Link to="/trending">Trending</Link>
-                <Link to="/actors">Actors</Link>
+                <Link to="/">{t('nav.home')}</Link>
+                <Link to="/movie">{t('nav.movies')}</Link>
+                <Link to="/tv">{t('nav.tvShows')}</Link>
+                <Link to="/trending">{t('nav.trending')}</Link>
+                <Link to="/actors">{t('nav.actors')}</Link>
               </div>
             </SheetContent>
           </Sheet>

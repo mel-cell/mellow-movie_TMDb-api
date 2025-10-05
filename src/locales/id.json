@@ -1,0 +1,46 @@
+{
+  "nav": {
+    "home": "Beranda",
+    "movies": "Film",
+    "tvShows": "Acara TV",
+    "trending": "Trending",
+    "actors": "Aktor",
+    "search": "Cari film, acara TV...",
+    "searching": "Mencari...",
+    "noResults": "Tidak ada hasil untuk",
+    "login": "Masuk",
+    "signup": "Daftar",
+    "profile": "Profil",
+    "favorites": "Favorit",
+    "logout": "Keluar"
+  },
+  "hero": {
+    "play": "Putar",
+    "myList": "Daftar Saya",
+    "duration": "2j 30m"
+  },
+  "login": {
+    "welcome": "Selamat Datang di Mellow",
+    "description": "Masuk dengan akun TMDb Anda untuk mengakses fitur yang dipersonalisasi",
+    "continueWithTMDb": "Lanjutkan dengan TMDb",
+    "connecting": "Menghubungkan...",
+    "error": "Gagal menyelesaikan login. Silakan coba lagi.",
+    "authError": "Gagal memulai autentikasi. Silakan coba lagi.",
+    "noAccount": "Tidak punya akun TMDb?",
+    "signUpHere": "Daftar di sini",
+    "terms": "Dengan masuk, Anda setuju dengan Ketentuan Penggunaan dan Kebijakan Privasi TMDb"
+  },
+  "common": {
+    "loading": "Memuat...",
+    "error": "Kesalahan",
+    "cancel": "Batal",
+    "confirm": "Konfirmasi",
+    "yes": "Ya",
+    "no": "Tidak"
+  },
+  "language": {
+    "english": "Inggris",
+    "indonesian": "Indonesia",
+    "switchLanguage": "Ganti Bahasa"
+  }
+}

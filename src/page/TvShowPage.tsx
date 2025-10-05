@@ -22,19 +22,26 @@ const TvShowPage: React.FC = () => {
   }, [page]);
 
   return (
-    <div className="p-4">
+    <div className="p-4 bg-black text-white min-h-screen w-screen">
+      <div className="max-w-7xl mx-auto mt-20">
+
       <h1 className="text-3xl font-bold mb-4">Popular TV Shows</h1>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {tvShows.map((tvShow, index) => (
-          <MediaCard key={tvShow.id} item={tvShow} rank={index + 1 + (page - 1) * 20} />
+          <MediaCard
+          key={tvShow.id}
+          item={tvShow}
+         
+          />
         ))}
       </div>
       <SimplePagination
         currentPage={page}
         totalPages={totalPages}
         onPageChange={setPage}
-      />
+        />
     </div>
+  </div>
   );
 };
 

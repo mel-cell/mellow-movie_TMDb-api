@@ -1,6 +1,6 @@
-import React from 'react';
-import type { Credit } from '../lib/api/TMDbServices';
-import { tmdbService } from '../lib/api/TMDbServices';
+import React from "react";
+import type { Credit } from "../lib/api/TMDbServices";
+import { tmdbService } from "../lib/api/TMDbServices";
 
 interface ActorListProps {
   movieId: number; // ID of the movie or TV show to fetch actors for
@@ -28,7 +28,10 @@ class ActorList extends React.Component<ActorListProps, ActorListState> {
   }
 
   componentDidUpdate(prevProps: ActorListProps) {
-    if (prevProps.movieId !== this.props.movieId || prevProps.isTVShow !== this.props.isTVShow) {
+    if (
+      prevProps.movieId !== this.props.movieId ||
+      prevProps.isTVShow !== this.props.isTVShow
+    ) {
       this.fetchActors();
     }
   }
@@ -44,7 +47,7 @@ class ActorList extends React.Component<ActorListProps, ActorListState> {
       }
       this.setState({ actors: credits.cast.slice(0, 10), loading: false }); // Limit to 10 actors
     } catch (err) {
-      this.setState({ error: 'Failed to load actors.', loading: false });
+      this.setState({ error: "Failed to load actors.", loading: false });
     }
   }
 
@@ -95,13 +98,19 @@ class ActorList extends React.Component<ActorListProps, ActorListState> {
                     />
                   ) : (
                     <div className="w-32 h-48 bg-gray-700 flex items-center justify-center rounded-lg">
-                      <span className="text-gray-400 text-sm text-center px-2">No Image</span>
+                      <span className="text-gray-400 text-sm text-center px-2">
+                        No Image
+                      </span>
                     </div>
                   )}
                   <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-300"></div>
                 </div>
-                <h3 className="text-white text-sm font-semibold truncate mb-1">{actor.name}</h3>
-                <p className="text-gray-400 text-xs truncate">{actor.character}</p>
+                <h3 className="text-white text-sm font-semibold truncate mb-1">
+                  {actor.name}
+                </h3>
+                <p className="text-muted-foreground text-xs truncate">
+                  {actor.character}
+                </p>
               </div>
             ))}
           </div>

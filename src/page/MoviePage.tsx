@@ -19,16 +19,16 @@ const MoviePage: React.FC = () => {
 
   // 🔹 Ambil daftar genre dari TMDb
   useEffect(() => {
-      const fetchGenres = async () => {
-        try {
-          const genresData = await getMovieGenres(); 
-          setGenres(genresData);
-        } catch (error) {
-          console.error('Error fetching genres:', error);
-        }
-      };
-      fetchGenres();
-    }, []);
+    const fetchGenres = async () => {
+      try {
+        const genresData = await getMovieGenres();
+        setGenres(genresData);
+      } catch (error) {
+        console.error("Error fetching genres:", error);
+      }
+    };
+    fetchGenres();
+  }, []);
   // 🔹 Ambil semua film populer / berdasarkan genre
   useEffect(() => {
     const fetchMovies = async () => {
@@ -42,10 +42,12 @@ const MoviePage: React.FC = () => {
           setTotalPages(data.total_pages);
         } else {
           // Load multiple pages for popular movies to show more
-          const pagesToLoad = [page, page + 1, page + 2].filter(p => p <= 500); // TMDB max 500 pages
-          const promises = pagesToLoad.map(p => getPopularMovies(p));
+          const pagesToLoad = [page, page + 1, page + 2].filter(
+            (p) => p <= 500
+          ); // TMDB max 500 pages
+          const promises = pagesToLoad.map((p) => getPopularMovies(p));
           const results = await Promise.all(promises);
-          const allMovies = results.flatMap(result => result.results);
+          const allMovies = results.flatMap((result) => result.results);
           setMovies(allMovies);
           setTotalPages(results[0].total_pages);
         }
@@ -78,9 +80,7 @@ const MoviePage: React.FC = () => {
   return (
     <div className="bg-black min-h-screen text-white pt-20">
       <div className="max-w-7xl mx-auto p-6">
-        <h1 className="text-3xl font-bold mb-6 text-red-500">
-           Popular Movies
-        </h1>
+        <h1 className="text-3xl font-bold mb-6 text-red-500">Popular Movies</h1>
 
         {/* 🔹 FILTER GENRE */}
         <div className="mb-6">

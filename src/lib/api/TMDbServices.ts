@@ -1,5 +1,7 @@
 /// <reference types="vite/client" />
 
+import axios from 'axios';
+
 const TMDB_API_KEY = import.meta.env.VITE_TMDB_API_KEY;
 
 // Pastikan IMAGE_BASE_URL memiliki garis miring di akhir untuk konsistensi
@@ -159,13 +161,14 @@ class TMDbService {
       }
     });
 
-    const response = await fetch(url.toString());
-    if (!response.ok) {
+    try {
+      const response = await axios.get(url.toString());
+      return response.data;
+    } catch (error: any) {
       throw new Error(
-        `TMDb API error: ${response.status} ${response.statusText}`
+        `TMDb API error: ${error.response?.status} ${error.response?.statusText}`
       );
     }
-    return response.json();
   }
 
   private async post(
@@ -182,20 +185,18 @@ class TMDbService {
       }
     });
 
-    const response = await fetch(url.toString(), {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json;charset=utf-8",
-      },
-      body: JSON.stringify(body),
-    });
-
-    if (!response.ok) {
+    try {
+      const response = await axios.post(url.toString(), body, {
+        headers: {
+          "Content-Type": "application/json;charset=utf-8",
+        },
+      });
+      return response.data;
+    } catch (error: any) {
       throw new Error(
-        `TMDb API error: ${response.status} ${response.statusText}`
+        `TMDb API error: ${error.response?.status} ${error.response?.statusText}`
       );
     }
-    return response.json();
   }
 
   // Similar Movies
@@ -251,14 +252,14 @@ class TMDbService {
     url.searchParams.append("api_key", this.apiKey);
     url.searchParams.append("session_id", sessionId);
 
-    const response = await fetch(url.toString(), { method: "DELETE" });
-
-    if (!response.ok) {
+    try {
+      const response = await axios.delete(url.toString());
+      return response.data;
+    } catch (error: any) {
       throw new Error(
-        `TMDb API error: ${response.status} ${response.statusText}`
+        `TMDb API error: ${error.response?.status} ${error.response?.statusText}`
       );
     }
-    return response.json();
   }
 
   async deleteTVRating(
@@ -269,14 +270,14 @@ class TMDbService {
     url.searchParams.append("api_key", this.apiKey);
     url.searchParams.append("session_id", sessionId);
 
-    const response = await fetch(url.toString(), { method: "DELETE" });
-
-    if (!response.ok) {
+    try {
+      const response = await axios.delete(url.toString());
+      return response.data;
+    } catch (error: any) {
       throw new Error(
-        `TMDb API error: ${response.status} ${response.statusText}`
+        `TMDb API error: ${error.response?.status} ${error.response?.statusText}`
       );
     }
-    return response.json();
   }
 
   async getRatedMovies(
@@ -428,6 +429,20 @@ class TMDbService {
     return data;
   }
 
+  // Get TV Season Details
+  async getTVSeasonDetails(tvId: number, seasonNumber: number): Promise<any> {
+    const data = await this.request(`/tv/${tvId}/season/${seasonNumber}`);
+    if (data.episodes) {
+      data.episodes = data.episodes.map((episode: any) => {
+        if (episode.still_path) {
+          episode.still_path = `${IMAGE_BASE_URL}/w300${episode.still_path}`;
+        }
+        return episode;
+      });
+    }
+    return data;
+  }
+
   // Search
   async searchMovies(
     query: string,
@@ -508,20 +523,19 @@ class TMDbService {
     const url = new URL(`${TMDB_BASE_URL}/authentication/session`);
     url.searchParams.append("api_key", this.apiKey);
 
-    const response = await fetch(url.toString(), {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json;charset=utf-8",
-      },
-      body: JSON.stringify({ session_id: sessionId }),
-    });
-
-    if (!response.ok) {
+    try {
+      const response = await axios.delete(url.toString(), {
+        data: { session_id: sessionId },
+        headers: {
+          "Content-Type": "application/json;charset=utf-8",
+        },
+      });
+      return response.data;
+    } catch (error: any) {
       throw new Error(
-        `TMDb API error: ${response.status} ${response.statusText}`
+        `TMDb API error: ${error.response?.status} ${error.response?.statusText}`
       );
     }
-    return response.json();
   }
 
   // Get Account Details
