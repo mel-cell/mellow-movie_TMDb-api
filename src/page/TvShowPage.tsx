@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+<<<<<<< HEAD
 import {
   getPopularTVShows,
   getTVByGenre,
@@ -6,6 +7,11 @@ import {
 } from "../lib/api/TMDbServices";
 import MediaCard from "../components/MediaCard";
 import SimplePagination from "../components/ui/SimplePagination";
+=======
+import { getPopularTVShows } from "../lib/api/TMDbServices";
+import SimplePagination from "../components/ui/SimplePagination";
+import MediaCard from "../components/MediaCard";
+>>>>>>> f61335f1ddca170b389b1e2bfc73a80651fdcc58
 import type { TVShow } from "../lib/api/TMDbServices";
 
 const TvShowPage: React.FC = () => {
@@ -14,8 +20,13 @@ const TvShowPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+<<<<<<< HEAD
   const [genres, setGenres] = useState<{ id: number; name: string }[]>([]);
   const [selectedGenre, setSelectedGenre] = useState<number | null>(null);
+=======
+  const [loading, setLoading] = useState(true); // ✅ fix
+  const [error, setError] = useState<string | null>(null); // optional
+>>>>>>> f61335f1ddca170b389b1e2bfc73a80651fdcc58
 
   // 🔹 Ambil daftar genre
   useEffect(() => {
@@ -57,6 +68,7 @@ const TvShowPage: React.FC = () => {
       setLoading(true);
       setError(null);
       try {
+<<<<<<< HEAD
         let data;
         if (selectedGenre) {
           data = await getTVByGenre(selectedGenre, page);
@@ -68,6 +80,14 @@ const TvShowPage: React.FC = () => {
       } catch (err: any) {
         console.error(err);
         setError("Gagal memuat data TV Shows");
+=======
+        const data = await getPopularTVShows(page);
+        setTvShows(data.results);
+        setTotalPages(data.total_pages);
+      } catch (err) {
+        console.error(err);
+        setError("Gagal memuat TV Shows");
+>>>>>>> f61335f1ddca170b389b1e2bfc73a80651fdcc58
       } finally {
         setLoading(false);
       }
@@ -98,6 +118,7 @@ const TvShowPage: React.FC = () => {
           Popular TV Shows
         </h1>
 
+<<<<<<< HEAD
         {/* 🔹 Filter Genre */}
         <div className="mb-6">
           <label
@@ -137,6 +158,23 @@ const TvShowPage: React.FC = () => {
           currentPage={page}
           totalPages={totalPages}
           onPageChange={setPage}
+=======
+      <h1 className="text-3xl font-bold mb-4">Popular TV Shows</h1>
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        {tvShows.map((tvShow, index) => (
+          <MediaCard
+          key={tvShow.id}
+          item={tvShow}
+         
+          />
+        ))}
+      </div>
+
+      <SimplePagination
+        currentPage={page}
+        totalPages={totalPages}
+        onPageChange={setPage}
+>>>>>>> f61335f1ddca170b389b1e2bfc73a80651fdcc58
         />
       </div>
     </div>

@@ -23,7 +23,7 @@ const MainPage: React.FC = () => {
         ]
           .filter((item) => item.poster_path)
           .sort((a, b) => b.vote_average - a.vote_average)
-          .slice(0, 20); // limit to 20
+          .slice(0, 20);
 
         if (combined.length > 0) {
           setTrendingAll(combined);
@@ -42,12 +42,12 @@ const MainPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-black text-white">
-      {/* 🧭 Hero Section */}
+      {/* Hero Section */}
       {heroItem && (
         <HeroSection heroMovie={heroItem} heroTrailer={null} heroCast={[]} />
       )}
 
-      {/* 🔥 Trending Section */}
+      {/* Trending Section */}
       <div className="max-w-screen-2xl mx-auto px-5 py-10">
         <h1 className="text-4xl font-extrabold text-red-500 mb-8">
           Trending Now
@@ -59,8 +59,6 @@ const MainPage: React.FC = () => {
           ))}
         </div>
       </div>
-
-      {/* Optional: bisa tambahin rekomendasi / trailer di bawah */}
     </div>
   );
 };

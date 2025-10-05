@@ -1,7 +1,7 @@
-import React from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Button } from "./ui/button";
 import { Dialog, DialogContent, DialogTrigger } from "./ui/dialog";
-import { Play, Plus } from "lucide-react";
+import { Play, Plus, VolumeX, Volume } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import type { Movie, TVShow, Video, Credit } from "../lib/api/TMDbServices";
 
@@ -17,6 +17,30 @@ const HeroSection: React.FC<HeroSectionProps> = ({
   heroCast,
 }) => {
   const { t } = useTranslation();
+
+  // ✅ Tambahan state untuk mute/unmute
+  const [isMuted, setIsMuted] = useState(true);
+
+  // ✅ Ref iframe untuk kontrol mute
+  const iframeRef = useRef<HTMLIFrameElement>(null);
+
+  // ✅ Fungsi toggle mute
+  const toggleMute = () => {
+    setIsMuted((prev) => !prev);
+  };
+
+  // ✅ Effect untuk mengupdate iframe src agar mute sesuai state
+  useEffect(() => {
+    if (iframeRef.current && heroTrailer) {
+      const src = `https://www.youtube.com/embed/${
+        heroTrailer.key
+      }?autoplay=1&mute=${isMuted ? 1 : 0}&controls=0&loop=1&playlist=${
+        heroTrailer.key
+      }&modestbranding=1&rel=0`;
+      iframeRef.current.src = src;
+    }
+  }, [isMuted, heroTrailer]);
+
   if (!heroMovie) return null;
 
   const isMovie = "title" in heroMovie;
@@ -33,16 +57,29 @@ const HeroSection: React.FC<HeroSectionProps> = ({
       {heroTrailer && (
         <div className="absolute inset-0 overflow-hidden">
           <iframe
+            ref={iframeRef} // attach ref
             id="hero-video-player"
             className="absolute inset-0 w-[130%] h-[130%] object-cover -top-[65px] -left-[32.5px] scale-[1.15] transform"
-            src={`https://www.youtube.com/embed/${heroTrailer.key}?autoplay=1&mute=1&controls=0&loop=1&playlist=${heroTrailer.key}&modestbranding=1&rel=0`}
+            src={`https://www.youtube.com/embed/${heroTrailer.key}?autoplay=1&mute=1&controls=0&playlist=${heroTrailer.key}&modestbranding=1&rel=0`}
             title="Trailer Background"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowFullScreen
             frameBorder="0"
           ></iframe>
+
+          <button
+            onClick={toggleMute}
+            className="absolute bottom-5 right-5 p-3 rounded-full bg-black/50 text-white hover:bg-black/70 transition z-50"
+          >
+            {isMuted ? (
+              <VolumeX className="h-5 w-5" />
+            ) : (
+              <Volume className="h-5 w-5" />
+            )}
+          </button>
         </div>
       )}
+
       {!heroTrailer && heroMovie.backdrop_path && (
         <div
           className="absolute inset-0 w-screen h-screen bg-cover bg-center"
@@ -88,7 +125,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({
                   {t('hero.play')}
                 </Button>
               </DialogTrigger>
-              <DialogContent className="max-w-6xl h-[80vh] p-0">
+              <DialogContent className="max-w-xl h-[80vh] p-0">
                 <iframe
                   width="100%"
                   height="100%"

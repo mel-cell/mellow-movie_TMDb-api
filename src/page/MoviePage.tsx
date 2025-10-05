@@ -31,7 +31,7 @@ const MoviePage: React.FC = () => {
   }, []);
   // 🔹 Ambil semua film populer / berdasarkan genre
   useEffect(() => {
-    const fetchMovies = async () => {
+    const fetchMovies = async () => {     
       setLoading(true);
       setError(null);
       try {

@@ -48,7 +48,10 @@ const Header: React.FC = () => {
   const [searchResults, setSearchResults] = useState<(Movie | TVShow)[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [searchParams, setSearchParams] = useSearchParams();
-  const [refresh, setRefresh] = useState(0);
+  const [refresh, setRefresh] = useState(0);  
+  const [language, setLanguage] = useState<"en-US" | "id-ID">("en-US");
+  // New: theme state
+  const [theme, setTheme] = useState<"light" | "dark">("dark"); // default dark
 
   const changeLanguage = (lng: string) => {
     i18n.changeLanguage(lng);
@@ -60,7 +63,30 @@ const Header: React.FC = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // 🔍 Realtime search dengan debounce
+  // Update bahasa di service setiap kali berubah
+  useEffect(() => {
+    tmdbService.setLanguage(language);
+  }, [language]);
+
+  // Dark/Light mode effect
+  useEffect(() => {
+    if (theme === "dark") {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+  }, [theme]);  
+
+  // Toggle theme function
+  const toggleTheme = () => {
+    const newTheme = theme === "dark" ? "light" : "dark";
+    setTheme(newTheme);
+    localStorage.setItem("theme", newTheme); // simpan theme
+    window.dispatchEvent(new Event("themeChange")); // kasih tau halaman lain
+  };
+
+
+  // Realtime search
   useEffect(() => {
     const delayDebounce = setTimeout(async () => {
       if (!searchQuery.trim()) {
@@ -80,16 +106,16 @@ const Header: React.FC = () => {
         ];
         setSearchResults(combined);
         setSearchParams({ q: searchQuery });
-        setRefresh((r) => r + 1); // 🔁 force rerender modal content
+        setRefresh((r) => r + 1);
       } catch (err) {
         console.error("Search error:", err);
-        setSearchResults([]);
       } finally {
         setIsSearching(false);
       }
     }, 400);
+
     return () => clearTimeout(delayDebounce);
-  }, [searchQuery, setSearchParams]);
+  }, [searchQuery, language, setSearchParams]);
 
   const dialog = (
       <div className="bg-black/95 backdrop-blur-xl border border-gray-700/50 shadow-2xl rounded-xl w-full max-w-2xl mx-4 max-h-[70vh] overflow-hidden">
@@ -177,8 +203,11 @@ const Header: React.FC = () => {
         }`}
       >
         <div className="container mx-auto flex justify-between items-center">
-          <Link to="/" className="text-3xl font-bold text-red-600">
-            Mellow
+          <Link
+            to="/"
+            className="text-3xl font-bold text-red-600 hover:text-red-600"
+          >
+            Netflix
           </Link>
 
           {/* Desktop Nav */}
@@ -248,6 +277,8 @@ const Header: React.FC = () => {
             >
               <Search className="h-5 w-5" />
             </Button>
+
+            {/* Login / User */}
             {!isLoggedIn ? (
               <div className="flex space-x-2">
                 <Link to="/login">
@@ -318,7 +349,7 @@ const Header: React.FC = () => {
         </div>
       </header>
 
-      {/* Render search dialog */}
+      {/* Portal untuk dialog */}
       {ReactDOM.createPortal(dialog, document.body)}
     </>
   );
