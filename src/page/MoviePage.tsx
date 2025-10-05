@@ -80,13 +80,7 @@ const MoviePage: React.FC = () => {
   return (
     <div className="bg-black min-h-screen text-white pt-20">
       <div className="max-w-7xl mx-auto p-6">
-<<<<<<< HEAD
         <h1 className="text-3xl font-bold mb-6 text-red-500">Popular Movies</h1>
-=======
-        <h1 className="text-3xl font-bold mb-6 text-white-500">
-           Popular Movies
-        </h1>
->>>>>>> tegar
 
         {/* 🔹 FILTER GENRE */}
         <div className="mb-6">

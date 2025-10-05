@@ -137,14 +137,7 @@ const DetailPage: React.FC = () => {
             ]);
         }
 
-<<<<<<< HEAD
         dispatch({ type: 'SET_DATA', payload: { details: detailsData, videos: videosData, credits: creditsData, similar: similarData } });
-=======
-        setDetails(detailsData);
-        setVideos(videosData);
-        setCredits(creditsData);
-        setSimilar(similarData);
->>>>>>> tegar
 
         // Fetch user rating and favorite status if logged in
         if (user && sessionId) {
