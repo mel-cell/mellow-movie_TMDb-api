@@ -53,14 +53,10 @@ const Header: React.FC = () => {
   // New: theme state
   const [theme, setTheme] = useState<"light" | "dark">("dark"); // default dark
 
-<<<<<<< HEAD
   const changeLanguage = (lng: string) => {
     i18n.changeLanguage(lng);
   };
 
-=======
-  // Sticky header
->>>>>>> tegar
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 10);
     window.addEventListener("scroll", handleScroll);
@@ -122,7 +118,6 @@ const Header: React.FC = () => {
   }, [searchQuery, language, setSearchParams]);
 
   const dialog = (
-<<<<<<< HEAD
       <div className="bg-black/95 backdrop-blur-xl border border-gray-700/50 shadow-2xl rounded-xl w-full max-w-2xl mx-4 max-h-[70vh] overflow-hidden">
         <CommandDialog key={refresh} open={openSearch} onOpenChange={setOpenSearch}>
           <CommandInput
@@ -196,64 +191,6 @@ const Header: React.FC = () => {
           </CommandList>
         </CommandDialog>
       </div>
-=======
-    <CommandDialog key={refresh} open={openSearch} onOpenChange={setOpenSearch}>
-      <CommandInput
-        placeholder={
-          language === "id-ID"
-            ? "Cari film, acara TV..."
-            : "Search movies, TV shows..."
-        }
-        value={searchQuery}
-        onValueChange={(value) => setSearchQuery(value)}
-      />
-      <CommandList>
-        {isSearching ? (
-          <CommandEmpty>
-            {language === "id-ID" ? "Memuat..." : "Loading..."}
-          </CommandEmpty>
-        ) : searchResults.length === 0 ? (
-          <CommandEmpty>
-            {language === "id-ID"
-              ? "Tidak ada hasil ditemukan."
-              : "No results found."}
-          </CommandEmpty>
-        ) : (
-          <CommandGroup heading={language === "id-ID" ? "Hasil" : "Results"}>
-            {searchResults.map((item) => (
-              <CommandItem
-                key={item.id}
-                onSelect={() => {
-                  const type = "title" in item ? "movie" : "tv";
-                  window.location.href = `/${type}/${item.id}`;
-                  setOpenSearch(false);
-                }}
-              >
-                <div className="flex items-center gap-2">
-                  {item.poster_path && (
-                    <img
-                      src={item.poster_path}
-                      alt={"title" in item ? item.title : item.name}
-                      className="w-8 h-12 object-cover rounded"
-                    />
-                  )}
-                  <div>
-                    <p className="font-medium">
-                      {"title" in item ? item.title : item.name}
-                    </p>
-                    <p className="text-sm text-gray-400">
-                      {"title" in item ? "Movie" : "TV Show"} •{" "}
-                      {item.vote_average?.toFixed(1)} ⭐
-                    </p>
-                  </div>
-                </div>
-              </CommandItem>
-            ))}
-          </CommandGroup>
-        )}
-      </CommandList>
-    </CommandDialog>
->>>>>>> tegar
   );
 
   return (
@@ -273,7 +210,6 @@ const Header: React.FC = () => {
             Netflix
           </Link>
 
-<<<<<<< HEAD
           {/* Desktop Nav */}
           <nav className="hidden md:flex items-center space-x-8">
             <Link
@@ -333,84 +269,6 @@ const Header: React.FC = () => {
               </DropdownMenuContent>
             </DropdownMenu>
 
-=======
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-6">
-            <nav className="flex items-center space-x-6 text-white">
-              <Link
-                to="/"
-                className="flex items-center gap-2 text-gray-100 hover:text-gray-300"
-              >
-                <Home className="h-5 w-5" />
-                {language === "id-ID" ? "Beranda" : "Home"}
-              </Link>
-              <Link
-                to="/movie"
-                className="flex items-center gap-2 text-gray-100 hover:text-gray-300"
-              >
-                <Film className="h-5 w-5" />
-                {language === "id-ID" ? "Film" : "Movies"}
-              </Link>
-              <Link
-                to="/tv"
-                className="flex items-center gap-2 text-gray-100 hover:text-gray-300"
-              >
-                <Tv className="h-5 w-5" />
-                {language === "id-ID" ? "Acara TV" : "TV Shows"}
-              </Link>
-              <Link
-                to="/trending"
-                className="flex items-center gap-2 text-gray-100 hover:text-gray-300"
-              >
-                <TrendingUp className="h-5 w-5" />
-                {language === "id-ID" ? "Trending" : "Trending"}
-              </Link>
-              <Link
-                to="/actors"
-                className="flex items-center gap-2 text-gray-100 hover:text-gray-300"
-              >
-                <Users className="h-5 w-5" />
-                {language === "id-ID" ? "Aktor" : "Actors"}
-              </Link>
-            </nav>
-          </div>
-
-          {/* Right side: language + search + login */}
-          <div className="flex items-center space-x-3">
-            {/* 🌍 Tombol pilihan bahasa EG / ID */}
-            <div className="flex border border-gray-700 rounded-full overflow-hidden text-sm">
-              <button
-                onClick={() => setLanguage("en-US")}
-                className={`px-3 py-1 font-medium ${
-                  language === "en-US"
-                    ? "bg-red-600 text-white"
-                    : "text-gray-300"
-                } hover:bg-red-600 hover:text-white transition`}
-              >
-                EG
-              </button>
-              <button
-                onClick={() => setLanguage("id-ID")}
-                className={`px-3 py-1 font-medium ${
-                  language === "id-ID"
-                    ? "bg-red-600 text-white"
-                    : "text-gray-300"
-                } hover:bg-red-600 hover:text-white transition`}
-              >
-                ID
-              </button>
-            </div>
-
-            {/* Theme Toggle Button */}
-            <button
-              onClick={toggleTheme} // panggil function di atas
-              className="px-3 py-1 ml-2 rounded bg-gray-700 text-white dark:bg-gray-200 dark:text-black text-sm transition"
-            >
-              {theme === "dark" ? "Light Mode" : "Dark Mode"}
-            </button>
-
-            {/* Search */}
->>>>>>> tegar
             <Button
               variant="ghost"
               size="icon"
@@ -425,20 +283,12 @@ const Header: React.FC = () => {
               <div className="flex space-x-2">
                 <Link to="/login">
                   <Button variant="outline" className="text-white border-white">
-<<<<<<< HEAD
                     {t('nav.login')}
-=======
-                    {language === "id-ID" ? "Masuk" : "Login"}
->>>>>>> tegar
                   </Button>
                 </Link>
                 <Link to="https://www.themoviedb.org/signup" target="_blank" rel="noopener noreferrer">
                   <Button className="bg-red-600 hover:bg-red-700 text-white">
-<<<<<<< HEAD
                     {t('nav.signup')}
-=======
-                    {language === "id-ID" ? "Daftar" : "Signup"}
->>>>>>> tegar
                   </Button>
                 </Link>
               </div>

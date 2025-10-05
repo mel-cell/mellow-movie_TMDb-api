@@ -65,15 +65,7 @@ const HomePage: React.FC = () => {
   // apply theme
 
   return (
-<<<<<<< HEAD
     <div className="min-h-screen bg-black text-white">
-=======
-    <div className="min-h-screen bg-white dark:bg-black text-black dark:text-white relative">
-      {/* Toggle Theme Button */}
-      <div className="absolute top-5 right-5 z-50"></div>
-
-      {/* Hero Section */}
->>>>>>> tegar
       <HeroSection
         heroMovie={heroMovie}
         heroTrailer={heroTrailer}
@@ -93,13 +85,8 @@ const HomePage: React.FC = () => {
       <div className="max-w-screen-2xl mx-auto p-5">
         {heroMovie && <VideoPlayRecommended movieId={heroMovie.id} />}
       </div>
-<<<<<<< HEAD
 
       <div className="max-w-screen-2xl mx-auto p-5">
-=======
-      
-      <div className='max-w-screen-2xl mx-auto p-5'>
->>>>>>> tegar
         {heroMovie && <ActorList movieId={heroMovie.id} />}
       </div>
     </div>

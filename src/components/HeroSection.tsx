@@ -1,15 +1,8 @@
-<<<<<<< HEAD
-import React from "react";
-import { Button } from "./ui/button";
-import { Dialog, DialogContent, DialogTrigger } from "./ui/dialog";
-import { Play, Plus } from "lucide-react";
-import { useTranslation } from "react-i18next";
-=======
 import React, { useState, useRef, useEffect } from "react";
 import { Button } from "./ui/button";
 import { Dialog, DialogContent, DialogTrigger } from "./ui/dialog";
-import { Play, Plus, Volume, VolumeX } from "lucide-react"; // ✅ icon volume
->>>>>>> tegar
+import { Play, Plus, VolumeX, Volume } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import type { Movie, TVShow, Video, Credit } from "../lib/api/TMDbServices";
 
 interface HeroSectionProps {
@@ -23,19 +16,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({
   heroTrailer,
   heroCast,
 }) => {
-<<<<<<< HEAD
   const { t } = useTranslation();
-=======
->>>>>>> tegar
-  if (!heroMovie) return null;
-
-  const isMovie = "title" in heroMovie;
-  const title = isMovie ? heroMovie.title : heroMovie.name;
-  const releaseDate = isMovie
-    ? heroMovie.release_date
-    : heroMovie.first_air_date;
-  const releaseYear = releaseDate ? new Date(releaseDate).getFullYear() : "";
-  const rating = Math.round(heroMovie.vote_average * 10);
 
   // ✅ Tambahan state untuk mute/unmute
   const [isMuted, setIsMuted] = useState(true);
@@ -60,6 +41,16 @@ const HeroSection: React.FC<HeroSectionProps> = ({
     }
   }, [isMuted, heroTrailer]);
 
+  if (!heroMovie) return null;
+
+  const isMovie = "title" in heroMovie;
+  const title = isMovie ? heroMovie.title : heroMovie.name;
+  const releaseDate = isMovie
+    ? heroMovie.release_date
+    : heroMovie.first_air_date;
+  const releaseYear = releaseDate ? new Date(releaseDate).getFullYear() : "";
+  const rating = Math.round(heroMovie.vote_average * 10);
+
   return (
     <section className="relative h-screen w-screen bg-black overflow-hidden">
       {/* Autoplay trailer background - Cropped to remove gaps */}
@@ -69,7 +60,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({
             ref={iframeRef} // attach ref
             id="hero-video-player"
             className="absolute inset-0 w-[130%] h-[130%] object-cover -top-[65px] -left-[32.5px] scale-[1.15] transform"
-            src={`https://www.youtube.com/embed/${heroTrailer.key}?autoplay=1&mute=1&controls=0&&playlist=${heroTrailer.key}&modestbranding=1&rel=0`}
+            src={`https://www.youtube.com/embed/${heroTrailer.key}?autoplay=1&mute=1&controls=0&playlist=${heroTrailer.key}&modestbranding=1&rel=0`}
             title="Trailer Background"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowFullScreen
@@ -114,11 +105,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({
                 {rating}%
               </span>
               <span>•</span>
-<<<<<<< HEAD
               <span>{t('hero.duration')}</span>{" "}
-=======
-              <span>2h 30m</span>{" "}
->>>>>>> tegar
               {/* Placeholder; fetch runtime from TMDb if needed */}
             </div>
           )}
@@ -144,11 +131,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({
                   height="100%"
                   src={`https://www.youtube.com/embed/${
                     heroTrailer?.key || ""
-<<<<<<< HEAD
                   }?autoplay=1`}
-=======
-                  }?autoplay=1&mute=${isMuted ? 1 : 0}`}
->>>>>>> tegar
                   title={heroTrailer?.name || "Trailer"}
                   allowFullScreen
                 ></iframe>
@@ -156,11 +139,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({
             </Dialog>
             <Button
               variant="outline"
-<<<<<<< HEAD
               className="text-white bg-transparent text-lg px-8 py-3 rounded-full font-semibold hover:bg-black hover:bg-opacity-10"
-=======
-              className="text-white border-white text-lg px-8 py-3 rounded-full font-semibold hover:bg-white hover:bg-opacity-10"
->>>>>>> tegar
             >
               <Plus className="mr-2 h-5 w-5" />
               {t('hero.myList')}

@@ -1,16 +1,9 @@
 import React, { useEffect, useState } from "react";
-<<<<<<< HEAD
 import { tmdbService } from "@/lib/api/TMDbServices";
 import type { Movie, TVShow } from "@/lib/api/TMDbServices";
 import HeroSection from "@/components/HeroSection";
 import TrendingSection from "@/components/TrendingSection";
 import MediaCard from "@/components/MediaCard";
-=======
-import { tmdbService } from "../lib/api/TMDbServices"; // ✅ import instance
-import type { Movie, TVShow } from "../lib/api/TMDbServices";
-import HeroSection from "../components/HeroSection";
-import MediaCard from "../components/MediaCard";
->>>>>>> tegar
 
 const MainPage: React.FC = () => {
   const [trendingAll, setTrendingAll] = useState<(Movie | TVShow)[]>([]);
