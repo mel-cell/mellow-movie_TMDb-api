@@ -17,8 +17,12 @@ const SearchSection: React.FC = () => {
       }
       setLoading(true);
       try {
-        const data = await tmdbService.searchMovies(query);
-        setResults(data.results || []);
+        // ✅ gabungkan pencarian Movie dan TV
+        const [movies, tvs] = await Promise.all([
+          tmdbService.searchMovies(query),
+          tmdbService.searchTVShows(query),
+        ]);
+        setResults([...movies.results, ...tvs.results]);
       } catch (err) {
         console.error('Search error:', err);
       } finally {

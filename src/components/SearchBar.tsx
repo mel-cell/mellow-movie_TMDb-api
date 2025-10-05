@@ -12,10 +12,13 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch, isSearching }) => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '');
 
-  // setiap kali q di URL berubah, sinkronkan inputnya
+  // Sinkronkan input dengan URL
   useEffect(() => {
     const q = searchParams.get('q') || '';
     setSearchQuery(q);
+    if (q.trim()) {
+      onSearch(q); // ✅ jalankan ulang pencarian saat halaman direfresh
+    }
   }, [searchParams]);
 
   const handleSearch = () => {
