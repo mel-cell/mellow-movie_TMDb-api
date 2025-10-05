@@ -145,10 +145,24 @@ class TMDbService {
     this.apiKey = TMDB_API_KEY;
   }
 
+  //Tambahan: state untuk bahasa dinamis
+  private currentLanguage: string = "en-US";
+
+  //Fungsi untuk ubah bahasa API
+  setLanguage(languageCode: string) {
+    // Contoh: "id-ID" untuk Bahasa Indonesia
+    this.currentLanguage = languageCode;
+  }
+
+  //Fungsi untuk ambil bahasa saat ini (opsional)
+  getLanguage() {
+    return this.currentLanguage;
+  }
+
   private async request(endpoint: string, params: Record<string, any> = {}) {
     const url = new URL(`${TMDB_BASE_URL}${endpoint}`);
     url.searchParams.append("api_key", this.apiKey);
-    url.searchParams.append("language", "en-US"); // Default language
+    url.searchParams.append("language", this.currentLanguage); // gunakan bahasa dinamis
 
     Object.entries(params).forEach(([key, value]) => {
       if (value !== undefined && value !== null) {

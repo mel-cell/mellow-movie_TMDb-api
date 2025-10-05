@@ -24,7 +24,7 @@ const BrowseSection: React.FC<BrowseSectionProps> = () => {
   const [results, setResults] = useState<(Movie | TVShow)[]>([]);
   const [totalPages, setTotalPages] = useState(1);
   const [currentPage, setCurrentPage] = useState(1);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchInput, setSearchInput] = useState('');
 

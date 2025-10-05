@@ -73,6 +73,7 @@ const TvShowPage: React.FC = () => {
           ))}
         </div>
       )}
+      
 
       {/* Pagination */}
       <div className="flex justify-center items-center mt-8 space-x-4">
