@@ -1,0 +1,46 @@
+{
+  "nav": {
+    "home": "Home",
+    "movies": "Movies",
+    "tvShows": "TV Shows",
+    "trending": "Trending",
+    "actors": "Actors",
+    "search": "Search movies, TV shows...",
+    "searching": "Searching...",
+    "noResults": "No results found for",
+    "login": "Login",
+    "signup": "Signup",
+    "profile": "Profile",
+    "favorites": "Favorites",
+    "logout": "Logout"
+  },
+  "hero": {
+    "play": "Play",
+    "myList": "My List",
+    "duration": "2h 30m"
+  },
+  "login": {
+    "welcome": "Welcome to Mellow",
+    "description": "Sign in with your TMDb account to access personalized features",
+    "continueWithTMDb": "Continue with TMDb",
+    "connecting": "Connecting...",
+    "error": "Failed to complete login. Please try again.",
+    "authError": "Failed to start authentication. Please try again.",
+    "noAccount": "Don't have a TMDb account?",
+    "signUpHere": "Sign up here",
+    "terms": "By signing in, you agree to TMDb's Terms of Use and Privacy Policy"
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "yes": "Yes",
+    "no": "No"
+  },
+  "language": {
+    "english": "English",
+    "indonesian": "Indonesian",
+    "switchLanguage": "Switch Language"
+  }
+}

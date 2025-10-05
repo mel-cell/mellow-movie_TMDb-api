@@ -1,8 +1,9 @@
-import React from 'react';
-import { Button } from './ui/button';
-import { Dialog, DialogContent, DialogTrigger } from './ui/dialog';
-import { Play, Plus } from 'lucide-react';
-import type { Movie, TVShow, Video, Credit } from '../lib/api/TMDbServices';
+import React from "react";
+import { Button } from "./ui/button";
+import { Dialog, DialogContent, DialogTrigger } from "./ui/dialog";
+import { Play, Plus } from "lucide-react";
+import { useTranslation } from "react-i18next";
+import type { Movie, TVShow, Video, Credit } from "../lib/api/TMDbServices";
 
 interface HeroSectionProps {
   heroMovie: Movie | TVShow | null;
@@ -10,14 +11,20 @@ interface HeroSectionProps {
   heroCast: Credit[];
 }
 
-const HeroSection: React.FC<HeroSectionProps> = ({ heroMovie, heroTrailer, heroCast }) => {
-
+const HeroSection: React.FC<HeroSectionProps> = ({
+  heroMovie,
+  heroTrailer,
+  heroCast,
+}) => {
+  const { t } = useTranslation();
   if (!heroMovie) return null;
 
-  const isMovie = 'title' in heroMovie;
+  const isMovie = "title" in heroMovie;
   const title = isMovie ? heroMovie.title : heroMovie.name;
-  const releaseDate = isMovie ? heroMovie.release_date : heroMovie.first_air_date;
-  const releaseYear = releaseDate ? new Date(releaseDate).getFullYear() : '';
+  const releaseDate = isMovie
+    ? heroMovie.release_date
+    : heroMovie.first_air_date;
+  const releaseYear = releaseDate ? new Date(releaseDate).getFullYear() : "";
   const rating = Math.round(heroMovie.vote_average * 10);
 
   return (
@@ -42,7 +49,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ heroMovie, heroTrailer, heroC
           style={{ backgroundImage: `url(${heroMovie.backdrop_path})` }}
         />
       )}
-      
+
       {/* Gradient Overlay */}
       <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-transparent" />
 
@@ -50,7 +57,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ heroMovie, heroTrailer, heroC
       <div className="relative flex items-center h-full pt-20 pl-12">
         <div className="text-left text-white max-w-4xl animate-fade-in">
           <h1 className="text-6xl font-bold mb-4">{title}</h1>
-          
+
           {/* Metadata */}
           {releaseYear && (
             <div className="flex items-center space-x-4 mb-4 text-sm text-gray-300">
@@ -61,33 +68,44 @@ const HeroSection: React.FC<HeroSectionProps> = ({ heroMovie, heroTrailer, heroC
                 {rating}%
               </span>
               <span>•</span>
-              <span>2h 30m</span> {/* Placeholder; fetch runtime from TMDb if needed */}
+              <span>{t('hero.duration')}</span>{" "}
+              {/* Placeholder; fetch runtime from TMDb if needed */}
             </div>
           )}
-          
-          <p className="text-lg mb-6 line-clamp-2 opacity-90 max-w-2xl">{heroMovie.overview}</p>
-          
+
+          <p className="text-lg mb-6 line-clamp-2 opacity-90 max-w-2xl">
+            {heroMovie.overview}
+          </p>
+
           <div className="flex gap-4 items-center">
             <Dialog>
               <DialogTrigger asChild>
-                <Button size="lg" className="bg-red-600 hover:bg-red-700 text-white text-lg px-12 py-3 rounded-full font-semibold shadow-lg">
+                <Button
+                  size="lg"
+                  className="bg-red-600 hover:bg-red-700 text-white text-lg px-12 py-3 rounded-full font-semibold shadow-lg"
+                >
                   <Play className="mr-2 h-5 w-5" />
-                  Play
+                  {t('hero.play')}
                 </Button>
               </DialogTrigger>
               <DialogContent className="max-w-6xl h-[80vh] p-0">
                 <iframe
                   width="100%"
                   height="100%"
-                  src={`https://www.youtube.com/embed/${heroTrailer?.key || ''}?autoplay=1`}
-                  title={heroTrailer?.name || 'Trailer'}
+                  src={`https://www.youtube.com/embed/${
+                    heroTrailer?.key || ""
+                  }?autoplay=1`}
+                  title={heroTrailer?.name || "Trailer"}
                   allowFullScreen
                 ></iframe>
               </DialogContent>
             </Dialog>
-            <Button variant="outline" className="text-white border-white text-lg px-8 py-3 rounded-full font-semibold hover:bg-white hover:bg-opacity-10">
+            <Button
+              variant="outline"
+              className="text-white bg-transparent text-lg px-8 py-3 rounded-full font-semibold hover:bg-black hover:bg-opacity-10"
+            >
               <Plus className="mr-2 h-5 w-5" />
-              My List
+              {t('hero.myList')}
             </Button>
           </div>
         </div>

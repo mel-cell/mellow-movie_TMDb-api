@@ -1,13 +1,13 @@
-import React, { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
-import { Skeleton } from '@/components/ui/skeleton';
-import { Heart, X } from 'lucide-react';
-import { tmdbService } from '@/lib/api/TMDbServices';
-import type { Movie, TVShow } from '@/lib/api/TMDbServices';
-import { useAuth } from '@/contexts/AuthContext';
-import MediaCard from '@/components/MediaCard';
+import React, { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Heart, X } from "lucide-react";
+import { tmdbService } from "@/lib/api/TMDbServices";
+import type { Movie, TVShow } from "@/lib/api/TMDbServices";
+import { useAuth } from "@/contexts/AuthContext";
+import MediaCard from "@/components/MediaCard";
 
-type FavoriteItem = (Movie | TVShow) & { mediaType: 'movie' | 'tv' };
+type FavoriteItem = (Movie | TVShow) & { mediaType: "movie" | "tv" };
 
 const FavPage: React.FC = () => {
   const { user, sessionId } = useAuth();
@@ -29,14 +29,20 @@ const FavPage: React.FC = () => {
         ]);
 
         const combined: FavoriteItem[] = [
-          ...movieFavorites.results.map(item => ({ ...item, mediaType: 'movie' as const })),
-          ...tvFavorites.results.map(item => ({ ...item, mediaType: 'tv' as const })),
+          ...movieFavorites.results.map((item) => ({
+            ...item,
+            mediaType: "movie" as const,
+          })),
+          ...tvFavorites.results.map((item) => ({
+            ...item,
+            mediaType: "tv" as const,
+          })),
         ];
 
         setFavorites(combined);
       } catch (err) {
-        console.error('Error fetching favorites:', err);
-        setError('Failed to load favorites. Please try again.');
+        console.error("Error fetching favorites:", err);
+        setError("Failed to load favorites. Please try again.");
       } finally {
         setLoading(false);
       }
@@ -56,10 +62,10 @@ const FavPage: React.FC = () => {
         item.mediaType,
         false
       );
-      setFavorites(prev => prev.filter(fav => fav.id !== item.id));
+      setFavorites((prev) => prev.filter((fav) => fav.id !== item.id));
     } catch (err) {
-      console.error('Error removing favorite:', err);
-      setError('Failed to remove favorite. Please try again.');
+      console.error("Error removing favorite:", err);
+      setError("Failed to remove favorite. Please try again.");
     }
   };
 
@@ -90,29 +96,29 @@ const FavPage: React.FC = () => {
 
   return (
     <div className="min-h-screen w-screen bg-black text-white p-4">
-      <div className='max-w-7xl mx-auto mt-20'>
-      <h1 className="text-3xl font-bold mb-4">My Favorites</h1>
-      {favorites.length === 0 ? (
-        <p className="text-gray-400">You haven't added any favorites yet.</p>
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-          {favorites.map((item) => (
-            <div key={item.id} className="relative group">
-              <MediaCard item={item} />
-              <Button
-                variant="destructive"
-                size="sm"
-                className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
-                onClick={() => removeFavorite(item as any)}
+      <div className="max-w-7xl mx-auto mt-20">
+        <h1 className="text-3xl font-bold mb-4">My Favorites</h1>
+        {favorites.length === 0 ? (
+          <p className="text-gray-400">You haven't added any favorites yet.</p>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+            {favorites.map((item) => (
+              <div key={item.id} className="relative group">
+                <MediaCard item={item} />
+                <Button
+                  variant="destructive"
+                  size="sm"
+                  className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
+                  onClick={() => removeFavorite(item as any)}
                 >
-                <X className="w-4 h-4" />
-              </Button>
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
+                  <X className="w-4 h-4" />
+                </Button>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
+    </div>
   );
 };
 

@@ -14,24 +14,24 @@ import { AuthProvider } from './contexts/AuthContext';
 
 function App() {
   return (
-    <AuthProvider>
-      <Router>
-        <Routes>
-          <Route path="/" element={<Layout />}>
-            <Route index element={<HomePage />} />
-            <Route path="movie" element={<MoviePage />} />
-            <Route path="movie/:id" element={<DetailPage />} />
-            <Route path="tv" element={<TvShowPage />} />
-            <Route path="tv/:id" element={<DetailPage />} />
-            <Route path="trending" element={<MainPage />} />
-            <Route path="actors" element={<ActorsPage />} />
-            <Route path="profile" element={<PrivateRoute><ProfilePage /></PrivateRoute>} />
-            <Route path="favorites" element={<PrivateRoute><FavPage /></PrivateRoute>} />
-          </Route>
-          <Route path="login" element={<Login />} />
-        </Routes>
-      </Router>
-    </AuthProvider>
+      <AuthProvider>
+        <Router>
+          <Routes>
+            <Route path="/" element={<Layout />}>
+              <Route index element={<HomePage />} />
+              <Route path="movie" element={<MoviePage />} />
+              <Route path="movie/:id" element={<DetailPage />} />
+              <Route path="tv" element={<TvShowPage />} />
+              <Route path="tv/:id" element={<DetailPage />} />
+              <Route path="trending" element={<MainPage />} />
+              <Route path="actors" element={<ActorsPage />} />
+              <Route path="profile" element={<PrivateRoute><ProfilePage /></PrivateRoute>} />
+              <Route path="favorites" element={<PrivateRoute><FavPage /></PrivateRoute>} />
+            </Route>
+            <Route path="login" element={<Login />} />
+          </Routes>
+        </Router>
+      </AuthProvider>
   );
 }
 

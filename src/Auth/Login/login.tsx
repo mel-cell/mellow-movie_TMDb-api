@@ -7,8 +7,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../..
 import { tmdbService } from '../../lib/api/TMDbServices';
 import { useAuth } from '../../contexts/AuthContext';
 import { Film, AlertCircle } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const Login: React.FC = () => {
+  const { t } = useTranslation();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [searchParams] = useSearchParams();
@@ -33,7 +35,7 @@ const Login: React.FC = () => {
       navigate('/');
     } catch (err) {
       console.error('Login failed:', err);
-      setError('Failed to complete login. Please try again.');
+      setError(t('login.error'));
     } finally {
       setIsLoading(false);
     }
@@ -56,7 +58,7 @@ const Login: React.FC = () => {
       }
     } catch (err) {
       console.error('Authentication failed:', err);
-      setError('Failed to start authentication. Please try again.');
+      setError(t('login.authError'));
       setIsLoading(false);
     }
   };
@@ -68,9 +70,9 @@ const Login: React.FC = () => {
           <div className="flex justify-center mb-4">
             <Film className="h-12 w-12 text-red-600" />
           </div>
-          <CardTitle className="text-2xl font-bold text-white">Welcome to Mellow</CardTitle>
+          <CardTitle className="text-2xl font-bold text-white">{t('login.welcome')}</CardTitle>
           <CardDescription className="text-gray-400">
-            Sign in with your TMDb account to access personalized features
+            {t('login.description')}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -87,19 +89,19 @@ const Login: React.FC = () => {
               disabled={isLoading}
               className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 text-lg font-semibold"
             >
-              {isLoading ? 'Connecting...' : 'Continue with TMDb'}
+              {isLoading ? t('login.connecting') : t('login.continueWithTMDb')}
             </Button>
 
             <div className="text-center">
               <p className="text-sm text-gray-400">
-                Don't have a TMDb account?{' '}
+                {t('login.noAccount')}{' '}
                 <a
                   href="https://www.themoviedb.org/signup"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-blue-400 hover:text-blue-300 underline"
                 >
-                  Sign up here
+                  {t('login.signUpHere')}
                 </a>
               </p>
             </div>

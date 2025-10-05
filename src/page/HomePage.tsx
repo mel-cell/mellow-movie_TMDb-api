@@ -1,11 +1,11 @@
-import { useState, useEffect } from 'react';
-import { tmdbService } from '@/lib/api/TMDbServices';
-import type { Movie, Video, Credit } from '@/lib/api/TMDbServices';
-import HeroSection from '@/components/HeroSection';
-import TrendingSection from '@/components/TrendingSection';
-import BrowseSection from '@/components/BrowseSection';
-import VideoPlayRecommended from '@/components/videoPlayrecomended';
-import ActorList from '@/components/actorlist';
+import { useState, useEffect } from "react";
+import { tmdbService } from "@/lib/api/TMDbServices";
+import type { Movie, Video, Credit } from "@/lib/api/TMDbServices";
+import HeroSection from "@/components/HeroSection";
+import TrendingSection from "@/components/TrendingSection";
+import BrowseSection from "@/components/BrowseSection";
+import VideoPlayRecommended from "@/components/videoPlayrecomended";
+import ActorList from "@/components/actorlist";
 
 const HomePage: React.FC = () => {
   const [heroMovie, setHeroMovie] = useState<Movie | null>(null);
@@ -15,11 +15,13 @@ const HomePage: React.FC = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const trendingMovieData = await tmdbService.getTrending('movie', 'day');
+        const trendingMovieData = await tmdbService.getTrending("movie", "day");
 
         // Set hero movie
         if (trendingMovieData.results.length > 0) {
-          const randomMovie = trendingMovieData.results[Math.floor(Math.random() * trendingMovieData.results.length)] as Movie;
+          const randomMovie = trendingMovieData.results[
+            Math.floor(Math.random() * trendingMovieData.results.length)
+          ] as Movie;
           setHeroMovie(randomMovie);
           const videos = await tmdbService.getMovieVideos(randomMovie.id);
           setHeroTrailer(videos[0] || null);
@@ -27,14 +29,14 @@ const HomePage: React.FC = () => {
           setHeroCast(credits.cast.slice(0, 4));
         }
       } catch (error) {
-        console.error('Error fetching data:', error);
+        console.error("Error fetching data:", error);
       }
     };
     fetchData();
   }, []);
 
   return (
-    <div className="min-h-screen bg-black ">
+    <div className="min-h-screen bg-black text-white">
       <HeroSection
         heroMovie={heroMovie}
         heroTrailer={heroTrailer}
@@ -49,11 +51,11 @@ const HomePage: React.FC = () => {
         <BrowseSection />
       </div>
 
-      <div className='max-w-screen-2xl mx-auto p-5'>
+      <div className="max-w-screen-2xl mx-auto p-5">
         {heroMovie && <VideoPlayRecommended movieId={heroMovie.id} />}
       </div>
 
-      <div className='max-w-screen-2xl mx-auto p-5'>
+      <div className="max-w-screen-2xl mx-auto p-5">
         {heroMovie && <ActorList movieId={heroMovie.id} />}
       </div>
     </div>
