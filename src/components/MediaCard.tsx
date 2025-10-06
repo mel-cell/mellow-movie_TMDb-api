@@ -1,5 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
+import { addFavorite } from '@/lib/api/TMDbServices';
+import { Heart } from 'lucide-react';
 import type { Movie, TVShow } from '../lib/api/TMDbServices';
 
 type MediaItem = Movie | TVShow;
@@ -11,6 +14,10 @@ interface MediaCardProps {
 }
 
 const MediaCard: React.FC<MediaCardProps> = ({ item, className = '', rank }) => {
+  const { user, sessionId } = useAuth();
+  const [isFavorite, setIsFavorite] = useState(false);
+  const [favoriteLoading, setFavoriteLoading] = useState(false);
+
   const isMovie = 'title' in item;
   const title = isMovie ? item.title : item.name;
   const releaseDate = isMovie ? item.release_date : item.first_air_date;
@@ -19,6 +26,21 @@ const MediaCard: React.FC<MediaCardProps> = ({ item, className = '', rank }) => 
   const imageUrl = item.poster_path
     ? `https://image.tmdb.org/t/p/w500${item.poster_path}`
     : null;
+
+  const handleFavoriteToggle = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!user || !sessionId) return;
+    setFavoriteLoading(true);
+    try {
+      await addFavorite(user.id.toString(), sessionId, item.id, type, !isFavorite);
+      setIsFavorite(!isFavorite);
+    } catch (err) {
+      console.error('Error toggling favorite:', err);
+    } finally {
+      setFavoriteLoading(false);
+    }
+  };
 
   return (
     <Link
@@ -40,9 +62,20 @@ const MediaCard: React.FC<MediaCardProps> = ({ item, className = '', rank }) => 
 
       {/* Rank number in top right corner */}
       {rank && (
-        <div className="absolute top-2 right-2 bg-red-600 text-white text-lg font-bold rounded-full w-8 h-8 flex items-center justify-center shadow-lg">
+        <div className="absolute top-2 right-2 bg-red-600 text-white text-lg font-bold rounded-full w-8 h-8 flex items-center justify-center shadow-lg z-10">
           {rank}
         </div>
+      )}
+
+      {/* Favorite button */}
+      {user && sessionId && (
+        <button
+          onClick={handleFavoriteToggle}
+          disabled={favoriteLoading}
+          className={`absolute ${rank ? 'top-2 right-10' : 'top-2 right-2'} bg-black/50 text-white p-1 rounded-full hover:bg-black/70 transition-colors z-10`}
+        >
+          <Heart className={`w-4 h-4 ${isFavorite ? 'fill-red-500 text-red-500' : ''}`} />
+        </button>
       )}
 
       {/* Hover overlay with info */}
