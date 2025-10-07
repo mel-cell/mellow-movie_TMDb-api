@@ -142,22 +142,17 @@ const TrendingSection: React.FC = () => {
       {/* Header */}
       <div className="border-b border-gray-800 pb-3 mb-6">
         <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-white">Trends Now</h2>
-          <Button
-            variant="ghost"
-            className="text-gray-400 hover:text-white text-sm"
-          >
-            View All
-          </Button>
+          <h2 className="text-3xl font-semibold text-white">Trends Now</h2>
+         
         </div>
       </div>
 
       {/* Category Tabs - Button style */}
-      <div className="flex justify-center space-x-4 mb-6">
+      <div className="flex flex-wrap justify-center gap-2 sm:gap-4 mb-6">
         {categoryNames.map((name, index) => (
           <button
             key={index}
-            className={`px-6 py-2 rounded-full font-semibold transition-all duration-300 cursor-pointer whitespace-nowrap ${
+            className={`px-4 sm:px-6 py-2 rounded-full font-semibold transition-all duration-300 cursor-pointer whitespace-nowrap ${
               selectedCategory === index
                 ? "bg-red-600 text-white shadow-lg transform scale-105"
                 : "bg-gray-800 text-gray-300 hover:bg-gray-700 hover:text-white hover:scale-105"
@@ -200,7 +195,7 @@ const TrendingSection: React.FC = () => {
       <div className="flex overflow-x-auto space-x-8 pb-4">
         {items.map((item, index) => (
           <div key={item.id} className="flex-shrink-0 w-56">
-            <MediaCard item={item} rank={selectedCategory === 0 ? index + 1 : undefined} />
+            <MediaCard item={item} rank={index} />
           </div>
         ))}
       </div>

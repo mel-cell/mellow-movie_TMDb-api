@@ -96,7 +96,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({
           <iframe
             ref={iframeRef}
             id="hero-video-player"
-            className="absolute inset-0 w-[130%] h-[130%] object-cover -top-[65px] -left-[32.5px] scale-[1.15] transform"
+            className="absolute inset-0 w-[110%] h-[110%] sm:w-[120%] sm:h-[120%] md:w-[130%] md:h-[130%] object-cover -top-[55px] sm:-top-[60px] md:-top-[65px] -left-[27.5px] sm:-left-[30px] md:-left-[32.5px] scale-[1.05] sm:scale-[1.1] md:scale-[1.15] transform"
             src={`https://www.youtube.com/embed/${heroTrailer.key}?autoplay=1&mute=1&controls=0&playlist=${heroTrailer.key}&modestbranding=1&rel=0`}
             title="Trailer Background"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -104,16 +104,6 @@ const HeroSection: React.FC<HeroSectionProps> = ({
             frameBorder="0"
           ></iframe>
 
-          <button
-            onClick={toggleMute}
-            className="absolute bottom-5 right-5 p-3 rounded-full bg-black/50 text-white hover:bg-black/70 transition z-50"
-          >
-            {isMuted ? (
-              <VolumeX className="h-5 w-5" />
-            ) : (
-              <Volume className="h-5 w-5" />
-            )}
-          </button>
         </div>
       )}
 
@@ -128,13 +118,13 @@ const HeroSection: React.FC<HeroSectionProps> = ({
       <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-transparent" />
 
       {/* Main content */}
-      <div className="relative flex items-center h-full pt-20 pl-12">
-        <div className="text-left text-white max-w-4xl animate-fade-in">
-          <h1 className="text-6xl font-bold mb-4">{title}</h1>
+      <div className="relative flex items-center h-full pt-16 px-4 sm:pt-20 sm:px-8 md:px-16 lg:pt-20 lg:pl-32 lg:pr-8">
+        <div className="text-left text-white max-w-4xl animate-fade-in w-full">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4">{title}</h1>
 
           {/* Metadata */}
           {releaseYear && (
-            <div className="flex items-center space-x-4 mb-4 text-sm text-gray-300">
+            <div className="flex flex-wrap items-center space-x-2 sm:space-x-4 mb-4 text-sm text-gray-300">
               <span>{releaseYear}</span>
               <span>•</span>
               <span className="flex items-center">
@@ -147,22 +137,22 @@ const HeroSection: React.FC<HeroSectionProps> = ({
             </div>
           )}
 
-          <p className="text-lg mb-6 line-clamp-2 opacity-90 max-w-2xl">
+          <p className="text-base sm:text-lg mb-6 line-clamp-2 opacity-90 max-w-2xl">
             {heroMovie.overview}
           </p>
 
-          <div className="flex gap-4 items-center">
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 items-start sm:items-center">
             <Dialog>
               <DialogTrigger asChild>
                 <Button
                   size="lg"
-                  className="bg-red-600 hover:bg-red-700 text-white text-lg px-12 py-3 rounded-full font-semibold shadow-lg"
+                  className="bg-red-600 hover:bg-red-700 text-white text-base sm:text-lg px-6 sm:px-12 py-2 sm:py-3 rounded-full font-semibold shadow-lg w-full sm:w-auto"
                 >
-                  <Play className="mr-2 h-5 w-5" />
+                  <Play className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
                   {t("hero.play")}
                 </Button>
               </DialogTrigger>
-              <DialogContent className="max-w-xl h-[80vh] p-0">
+              <DialogContent className="w-full h-full max-w-none p-0">
                 <iframe
                   width="100%"
                   height="100%"
@@ -176,10 +166,20 @@ const HeroSection: React.FC<HeroSectionProps> = ({
             </Dialog>
             <Button
               variant="outline"
-              className="text-white bg-transparent text-lg px-8 py-3 rounded-full font-semibold hover:bg-black hover:bg-opacity-10"
+              className="text-white bg-transparent text-base sm:text-lg px-6 sm:px-8 py-2 sm:py-3 rounded-full font-semibold hover:bg-black hover:bg-opacity-10 w-full sm:w-auto"
             >
-              <Plus className="mr-2 h-5 w-5" />
+              <Plus className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
               {t("hero.myList")}
+            </Button>
+            <Button
+              onClick={toggleMute}
+              className="p-2 sm:p-3 rounded-full bg-none border-white text-white hover:bg-black/70 transition z-50 w-auto"
+            >
+              {isMuted ? (
+                <VolumeX className="h-4 w-4 sm:h-5 sm:w-5" />
+              ) : (
+                <Volume className="h-4 w-4 sm:h-5 sm:w-5" />
+              )}
             </Button>
           </div>
         </div>

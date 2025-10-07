@@ -1,9 +1,14 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
-import { addFavorite } from '@/lib/api/TMDbServices';
-import { Heart } from 'lucide-react';
-import type { Movie, TVShow } from '../lib/api/TMDbServices';
+import React, { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
+import {
+  addFavorite,
+  getMovieAccountStates,
+  getTVAccountStates,
+} from "@/lib/api/TMDbServices";
+import { Heart } from "lucide-react";
+import type { Movie, TVShow } from "../lib/api/TMDbServices";
+import { Button } from "./ui/button";
 
 type MediaItem = Movie | TVShow;
 
@@ -11,18 +16,40 @@ interface MediaCardProps {
   item: MediaItem;
   className?: string;
   rank?: number;
+  rating?: number;
 }
 
-const MediaCard: React.FC<MediaCardProps> = ({ item, className = '', rank }) => {
+const MediaCard: React.FC<MediaCardProps> = ({
+  item,
+  className = "",
+  rank,
+  rating,
+}) => {
   const { user, sessionId } = useAuth();
+  const navigate = useNavigate();
   const [isFavorite, setIsFavorite] = useState(false);
   const [favoriteLoading, setFavoriteLoading] = useState(false);
 
-  const isMovie = 'title' in item;
+  const isMovie = "title" in item;
+
+  useEffect(() => {
+    const fetchFavoriteState = async () => {
+      if (!user || !sessionId) return;
+      try {
+        const states = isMovie
+          ? await getMovieAccountStates(item.id, sessionId)
+          : await getTVAccountStates(item.id, sessionId);
+        setIsFavorite(states.favorite);
+      } catch (err) {
+        console.error("Error fetching favorite state:", err);
+      }
+    };
+    fetchFavoriteState();
+  }, [user, sessionId, item.id, isMovie]);
   const title = isMovie ? item.title : item.name;
   const releaseDate = isMovie ? item.release_date : item.first_air_date;
-  const year = releaseDate ? new Date(releaseDate).getFullYear() : 'N/A';
-  const type = isMovie ? 'movie' : 'tv';
+  const year = releaseDate ? new Date(releaseDate).getFullYear() : "N/A";
+  const type = isMovie ? "movie" : "tv";
   const imageUrl = item.poster_path
     ? `https://image.tmdb.org/t/p/w500${item.poster_path}`
     : null;
@@ -30,13 +57,23 @@ const MediaCard: React.FC<MediaCardProps> = ({ item, className = '', rank }) => 
   const handleFavoriteToggle = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    if (!user || !sessionId) return;
+    if (!user || !sessionId) {
+      alert("You must login first to use this function.");
+      navigate("/login");
+      return;
+    }
     setFavoriteLoading(true);
     try {
-      await addFavorite(user.id.toString(), sessionId, item.id, type, !isFavorite);
+      await addFavorite(
+        user.id.toString(),
+        sessionId,
+        item.id,
+        type,
+        !isFavorite
+      );
       setIsFavorite(!isFavorite);
     } catch (err) {
-      console.error('Error toggling favorite:', err);
+      console.error("Error toggling favorite:", err);
     } finally {
       setFavoriteLoading(false);
     }
@@ -62,21 +99,30 @@ const MediaCard: React.FC<MediaCardProps> = ({ item, className = '', rank }) => 
 
       {/* Rank number in top right corner */}
       {rank && (
-        <div className="absolute top-2 right-2 bg-red-600 text-white text-lg font-bold rounded-full w-8 h-8 flex items-center justify-center shadow-lg z-10">
+        <div className="absolute top-2 right-10 bg-red-600 text-white text-lg font-bold rounded-full w-8 h-8 flex items-center justify-center shadow-lg z-10">
           {rank}
         </div>
       )}
 
-      {/* Favorite button */}
-      {user && sessionId && (
-        <button
-          onClick={handleFavoriteToggle}
-          disabled={favoriteLoading}
-          className={`absolute ${rank ? 'top-2 right-10' : 'top-2 right-2'} bg-black/50 text-white p-1 rounded-full hover:bg-black/70 transition-colors z-10`}
-        >
-          <Heart className={`w-4 h-4 ${isFavorite ? 'fill-red-500 text-red-500' : ''}`} />
-        </button>
+      {/* Rating badge */}
+      {rating && (
+        <div className="absolute top-2 right-2 bg-yellow-400 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold shadow-lg z-10">
+          {rating}
+        </div>
       )}
+
+      {/* Favorite button */}
+      <Button
+        onClick={handleFavoriteToggle}
+        disabled={favoriteLoading}
+        className={`absolute ${
+          rank ? "top-2 left-2" : "top-2 left-2"
+        }  bg-black/50 text-white p-2 rounded-full hover:bg-black/70 transition-colors z-10`}
+      >
+        <Heart
+          className={`w-4 h-4 ${isFavorite ? "fill-red-500 text-red-500" : ""}`}
+        />
+      </Button>
 
       {/* Hover overlay with info */}
       <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-300 flex flex-col justify-end p-4">
@@ -89,9 +135,7 @@ const MediaCard: React.FC<MediaCardProps> = ({ item, className = '', rank }) => 
             ⭐ {item.vote_average.toFixed(1)}
           </span>
         </div>
-        <div className="text-gray-400 text-xs mt-1 capitalize">
-          {type}
-        </div>
+        <div className="text-gray-400 text-xs mt-1 capitalize">{type}</div>
       </div>
     </Link>
   );

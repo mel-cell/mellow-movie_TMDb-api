@@ -119,7 +119,7 @@ const HomePage: React.FC = () => {
 
       {/* Bagian Trending */}
       <div className="max-w-7xl mx-auto">
-        <div className="max-w-screen p-5">
+        <div className="max-w-screen-2xl mx-auto px-2 py-4 sm:px-4 sm:py-5 md:px-5">
           <Suspense
             fallback={
               <div className="h-64 bg-gray-800 animate-pulse rounded"></div>
@@ -130,7 +130,7 @@ const HomePage: React.FC = () => {
         </div>
 
         {/* Bagian Browse */}
-        <div className="max-w-screen-2xl mx-auto p-5">
+        <div className="max-w-screen-2xl mx-auto px-2 py-4 sm:px-4 sm:py-5 md:px-5">
           <Suspense
             fallback={
               <div className="h-64 bg-gray-800 animate-pulse rounded"></div>
@@ -141,7 +141,7 @@ const HomePage: React.FC = () => {
         </div>
 
         {/* Bagian Video Recommended */}
-        <div className="max-w-screen-2xl mx-auto p-5">
+        <div className="max-w-screen-2xl mx-auto px-2 py-4 sm:px-4 sm:py-5 md:px-5">
           {heroMovie && (
             <Suspense
               fallback={
@@ -154,7 +154,7 @@ const HomePage: React.FC = () => {
         </div>
 
         {/* Bagian Actor List */}
-        <div className="max-w-screen-2xl mx-auto p-5">
+        <div className="max-w-screen-2xl mx-auto px-2 py-4 sm:px-4 sm:py-5 md:px-5">
           {heroMovie && (
             <Suspense
               fallback={

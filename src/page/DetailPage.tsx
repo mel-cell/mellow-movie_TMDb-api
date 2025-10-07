@@ -13,6 +13,8 @@ import {
   addTVRating,
   getSimilarMovies,
   getSimilarTVShows,
+  getMovieAccountStates,
+  getTVAccountStates,
 } from "@/lib/api/TMDbServices";
 import type {
   MovieDetail,
@@ -25,6 +27,7 @@ import type {
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import MediaCard from "@/components/MediaCard";
+import StarRating from "@/components/StarRating";
 
 interface DetailState {
   details: MovieDetail | TVDetail | null;
@@ -174,26 +177,22 @@ const DetailPage: React.FC = () => {
         // Fetch user rating and favorite status if logged in
         if (user && sessionId) {
           try {
-            const [ratedData, favoritesData] = await Promise.all([
-              type === "movie"
-                ? tmdbService.getRatedMovies(user.id.toString(), sessionId)
-                : tmdbService.getRatedTVShows(user.id.toString(), sessionId),
-              tmdbService.getFavorites(user.id.toString(), sessionId),
-            ]);
+            const accountStates = type === "movie"
+              ? await getMovieAccountStates(itemId, sessionId)
+              : await getTVAccountStates(itemId, sessionId);
 
-            const ratedItem = ratedData.results.find(
-              (item) => item.id === itemId
-            );
-            if (ratedItem) {
-              // Assuming rated items have rating, but TMDB rated list may not include rating value
-              // For now, set to null, as API doesn't provide the rating value in list
-              dispatch({ type: "SET_USER_RATING", payload: null }); // TMDB doesn't provide rating value in rated list
+            dispatch({ type: "SET_IS_FAVORITE", payload: accountStates.favorite });
+
+            // Fetch rating value if rated
+            if (accountStates.rated) {
+              const ratedItems = type === "movie"
+                ? await tmdbService.getRatedMovies(user.id.toString(), sessionId)
+                : await tmdbService.getRatedTVShows(user.id.toString(), sessionId);
+              const ratedItem = ratedItems.results.find((item: any) => item.id === itemId);
+              if (ratedItem && (ratedItem as any).rating) {
+                dispatch({ type: "SET_USER_RATING", payload: (ratedItem as any).rating });
+              }
             }
-
-            const favoriteItem = favoritesData.results.find(
-              (item) => item.id === itemId
-            );
-            dispatch({ type: "SET_IS_FAVORITE", payload: !!favoriteItem });
           } catch (err) {
             console.error("Error fetching user status:", err);
           }
@@ -375,7 +374,7 @@ const DetailPage: React.FC = () => {
               <ArrowLeft className="w-4 h-4 mr-2" />
               {t("detail.back")}
             </Button>
-          </Link>
+          aga</Link>
         </div>
       </div>
 
@@ -590,30 +589,14 @@ const DetailPage: React.FC = () => {
               <div className="mb-8 flex items-center gap-6">
                 <div className="flex items-center gap-2">
                   <Star className="w-5 h-5 text-yellow-500" />
-                  <label htmlFor="rating" className="text-white font-semibold">
+                  <label className="text-white font-semibold">
                     {t("detail.yourRating")}
                   </label>
-                  <select
-                    id="rating"
-                    value={state.userRating ?? ""}
-                    onChange={(e) => handleRatingChange(Number(e.target.value))}
+                  <StarRating
+                    rating={state.userRating ? Math.round(state.userRating / 2) : null}
+                    onRatingChange={(starRating) => handleRatingChange(starRating * 2)}
                     disabled={state.ratingLoading}
-                    className="bg-gray-800 text-white rounded px-3 py-1 border border-gray-600"
-                  >
-                    <option value="">
-                      {t("detail.rateThis")} {type}
-                    </option>
-                    {[...Array(10)].map((_, i) => (
-                      <option key={i + 1} value={i + 1}>
-                        {i + 1}
-                      </option>
-                    ))}
-                  </select>
-                  {state.userRating && (
-                    <span className="text-yellow-500 font-semibold">
-                      {state.userRating}/10
-                    </span>
-                  )}
+                  />
                 </div>
                 <Button
                   variant={state.isFavorite ? "destructive" : "default"}

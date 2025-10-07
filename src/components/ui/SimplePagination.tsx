@@ -51,12 +51,12 @@ const SimplePagination: React.FC<SimplePaginationProps> = ({
   };
 
   return (
-    <div className="flex items-center justify-center space-x-2 mt-6">
+    <div className="flex items-center justify-center space-x-1 sm:space-x-2 mt-6">
       {/* 🔹 Tombol Prev */}
       <button
         onClick={handlePrev}
         disabled={currentPage === 1}
-        className={`px-3 py-1.5 rounded-full font-semibold border transition ${
+        className={`px-2 sm:px-3 py-1 sm:py-1.5 rounded-full font-semibold border transition text-sm sm:text-base ${
           currentPage === 1
             ? "border-gray-600 text-gray-500 cursor-not-allowed"
             : "border-red-700 text-red-500 hover:bg-red-700 hover:text-white"
@@ -68,14 +68,14 @@ const SimplePagination: React.FC<SimplePaginationProps> = ({
       {/* 🔹 Tombol Angka */}
       {getPageNumbers().map((page, index) =>
         page === "..." ? (
-          <span key={index} className="px-2 text-gray-400 select-none">
+          <span key={index} className="px-1 sm:px-2 text-gray-400 select-none text-sm sm:text-base">
             ...
           </span>
         ) : (
           <button
             key={index}
             onClick={() => onPageChange(page as number)}
-            className={`px-3 py-1.5 rounded-full border font-semibold transition ${
+            className={`px-2 sm:px-3 py-1 sm:py-1.5 rounded-full border font-semibold transition text-sm sm:text-base ${
               currentPage === page
                 ? "bg-red-700 border-red-700 text-white"
                 : "border-red-700 text-red-500 hover:bg-red-700 hover:text-white"
@@ -90,7 +90,7 @@ const SimplePagination: React.FC<SimplePaginationProps> = ({
       <button
         onClick={handleNext}
         disabled={currentPage === totalPages}
-        className={`px-3 py-1.5 rounded-full font-semibold border transition ${
+        className={`px-2 sm:px-3 py-1 sm:py-1.5 rounded-full font-semibold border transition text-sm sm:text-base ${
           currentPage === totalPages
             ? "border-gray-600 text-gray-500 cursor-not-allowed"
             : "border-red-700 text-red-500 hover:bg-red-700 hover:text-white"

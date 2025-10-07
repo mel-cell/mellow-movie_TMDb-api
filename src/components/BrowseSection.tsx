@@ -7,10 +7,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Slider } from "@/components/ui/slider";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search } from "lucide-react";
+import { Search, Film, Tv, Crown } from "lucide-react";
 import { tmdbService } from "@/lib/api/TMDbServices";
 import type {
   Movie,
@@ -19,6 +18,7 @@ import type {
   SearchResult,
 } from "@/lib/api/TMDbServices";
 import MediaCard from "./MediaCard";
+import StarRating from "./StarRating";
 import SimplePagination from "@/components/ui/SimplePagination";
 
 interface BrowseSectionProps {}
@@ -31,8 +31,8 @@ const BrowseSection: React.FC<BrowseSectionProps> = () => {
   );
   const [year, setYear] = useState<number | null>(null);
   const [sortBy, setSortBy] = useState<
-    "title.asc" | "title.desc" | "vote_average.desc"
-  >("vote_average.desc");
+    "highest_rated" | "a_z" | "z_a" | "newest" | "oldest"
+  >("highest_rated");
   const [minRating, setMinRating] = useState<number>(0);
   const [results, setResults] = useState<(Movie | TVShow)[]>([]);
   const [totalPages, setTotalPages] = useState(1);
@@ -72,7 +72,25 @@ const BrowseSection: React.FC<BrowseSectionProps> = () => {
           if (selectedGenres.length > 0) {
             params.with_genres = selectedGenres.join(",");
           }
-          params.sort_by = sortBy;
+          let sortParam = "vote_average.desc";
+          switch (sortBy) {
+            case "highest_rated":
+              sortParam = "vote_average.desc";
+              break;
+            case "a_z":
+              sortParam = "title.asc";
+              break;
+            case "z_a":
+              sortParam = "title.desc";
+              break;
+            case "newest":
+              sortParam = category === "tv" || category === "original" ? "first_air_date.desc" : "release_date.desc";
+              break;
+            case "oldest":
+              sortParam = category === "tv" || category === "original" ? "first_air_date.asc" : "release_date.asc";
+              break;
+          }
+          params.sort_by = sortParam;
           if (minRating > 0) {
             params["vote_average.gte"] = minRating;
           }
@@ -96,20 +114,28 @@ const BrowseSection: React.FC<BrowseSectionProps> = () => {
           }
         }
 
-        console.log('Results length before filtering:', data.results.length);
+        console.log("Results length before filtering:", data.results.length);
         if (data.results.length > 0) {
-          console.log('First result vote_average before filtering:', data.results[0].vote_average);
+          console.log(
+            "First result vote_average before filtering:",
+            data.results[0].vote_average
+          );
         }
 
         // Apply client-side rating filter if minRating > 0
         let filteredResults = data.results;
         if (minRating > 0) {
-          filteredResults = data.results.filter(item => item.vote_average >= minRating);
+          filteredResults = data.results.filter(
+            (item) => item.vote_average >= minRating
+          );
         }
 
-        console.log('Results length after filtering:', filteredResults.length);
+        console.log("Results length after filtering:", filteredResults.length);
         if (filteredResults.length > 0) {
-          console.log('First result vote_average after filtering:', filteredResults[0].vote_average);
+          console.log(
+            "First result vote_average after filtering:",
+            filteredResults[0].vote_average
+          );
         }
 
         setResults(filteredResults);
@@ -145,15 +171,15 @@ const BrowseSection: React.FC<BrowseSectionProps> = () => {
     setSelectedGenres([]);
     setYear(null);
     setMinRating(0);
-    setSortBy("vote_average.desc");
+    setSortBy("highest_rated");
     setCurrentPage(1);
     setSearchQuery("");
     setSearchInput("");
   };
 
   const years = Array.from(
-    { length: new Date().getFullYear() - 1900 + 1 },
-    (_, i) => 1900 + i
+    { length: 2025 - 1900 + 1 },
+    (_, i) => 2025 - i
   ).reverse();
 
   return (
@@ -170,24 +196,42 @@ const BrowseSection: React.FC<BrowseSectionProps> = () => {
           }}
           className="mb-6"
         >
-          <TabsList className="grid w-full grid-cols-3 bg-black border border-gray-700 rounded-lg">
+          <TabsList className="grid w-full grid-cols-3 bg-none gap-3 p-0">
             <TabsTrigger
               value="movie"
-              className="text-white data-[state=active]:text-white data-[state=active]:bg-red-600"
+              className="
+      flex items-center gap-2 px-3 sm:px-4 py-2 rounded-full bg-gray-800 text-white text-lg sm:text-xl transition-all duration-300
+      data-[state=active]:bg-red-600 data-[state=active]:text-white data-[state=active]:text-xl sm:data-[state=active]:text-2xl data-[state=active]:font-bold
+      hover:bg-gray-700
+    "
             >
-              Movies
+              <Film className="w-4 h-4 sm:w-5 sm:h-5 data-[state=active]:w-6 sm:data-[state=active]:w-8 data-[state=active]:h-6 sm:data-[state=active]:h-8" />
+              <span className="hidden sm:inline">Movies</span>
+              <span className="sm:hidden">Movie</span>
             </TabsTrigger>
             <TabsTrigger
               value="tv"
-              className="text-white data-[state=active]:text-white data-[state=active]:bg-red-600"
+              className="
+      flex items-center gap-2 px-3 sm:px-4 py-2 rounded-full bg-gray-800 text-white text-lg sm:text-xl transition-all duration-300
+      data-[state=active]:bg-red-600 data-[state=active]:text-white data-[state=active]:text-xl sm:data-[state=active]:text-2xl data-[state=active]:font-bold
+      hover:bg-gray-700
+    "
             >
-              TV Shows
+              <Tv className="w-4 h-4 sm:w-5 sm:h-5 data-[state=active]:w-6 sm:data-[state=active]:w-8 data-[state=active]:h-6 sm:data-[state=active]:h-8" />
+              <span className="hidden sm:inline">TV Shows</span>
+              <span className="sm:hidden">TV</span>
             </TabsTrigger>
             <TabsTrigger
               value="original"
-              className="text-white data-[state=active]:text-white data-[state=active]:bg-red-600"
+              className="
+      flex items-center gap-2 px-3 sm:px-4 py-2 rounded-full bg-gray-800 text-white text-lg sm:text-xl transition-all duration-300
+      data-[state=active]:bg-red-600 data-[state=active]:text-white data-[state=active]:text-xl sm:data-[state=active]:text-2xl data-[state=active]:font-bold
+      hover:bg-gray-700
+    "
             >
-              Original Series
+              <Crown className="w-4 h-4 sm:w-5 sm:h-5 data-[state=active]:w-6 sm:data-[state=active]:w-8 data-[state=active]:h-6 sm:data-[state=active]:h-8" />
+              <span className="hidden sm:inline">Original Series</span>
+              <span className="sm:hidden">Original</span>
             </TabsTrigger>
           </TabsList>
         </Tabs>
@@ -200,7 +244,7 @@ const BrowseSection: React.FC<BrowseSectionProps> = () => {
               variant={
                 selectedGenres.includes(genre.id) ? "default" : "outline"
               }
-              className={`rounded-full px-4 py-2 ${
+              className={`rounded-full px-3 sm:px-4 py-2 text-sm sm:text-base ${
                 selectedGenres.includes(genre.id)
                   ? "bg-red-600 hover:bg-red-700 text-white"
                   : "bg-gray-800 text-gray-300 border-gray-600 hover:bg-gray-700"
@@ -241,13 +285,15 @@ const BrowseSection: React.FC<BrowseSectionProps> = () => {
               </Button>
             </div>
             <Select value={sortBy} onValueChange={setSortBy as any}>
-              <SelectTrigger className="w-full md:w-32 bg-gray-800 border-gray-600 text-white rounded-full">
+              <SelectTrigger className="w-full md:w-32 bg-gray-800 border-gray-600 text-white rounded-full text-sm sm:text-base">
                 <SelectValue placeholder="Sort By" />
               </SelectTrigger>
               <SelectContent className="bg-gray-800 border-gray-600 text-white">
-                <SelectItem value="vote_average.desc">Highest Rated</SelectItem>
-                <SelectItem value="title.asc">A-Z</SelectItem>
-                <SelectItem value="title.desc">Z-A</SelectItem>
+                <SelectItem value="highest_rated">Highest Rated</SelectItem>
+                <SelectItem value="newest">Newest</SelectItem>
+                <SelectItem value="oldest">Oldest</SelectItem>
+                <SelectItem value="a_z">A-Z</SelectItem>
+                <SelectItem value="z_a">Z-A</SelectItem>
               </SelectContent>
             </Select>
             <Select
@@ -256,41 +302,39 @@ const BrowseSection: React.FC<BrowseSectionProps> = () => {
                 setYear(value === "all" ? null : parseInt(value))
               }
             >
-              <SelectTrigger className="w-full md:w-32 bg-gray-800 border-gray-600 text-white rounded-full">
+              <SelectTrigger className="w-full md:w-32 bg-gray-800 border-gray-600 text-white rounded-full text-sm sm:text-base">
                 <SelectValue placeholder="Year" />
               </SelectTrigger>
               <SelectContent className="bg-gray-800 border-gray-600 text-white">
                 <SelectItem value="all">All Years</SelectItem>
-                {years
-                  .slice(-20)
-                  .reverse()
-                  .map((y) => (
-                    <SelectItem key={y} value={y.toString()}>
-                      {y}
-                    </SelectItem>
-                  ))}
+                {years.map((y) => (
+                  <SelectItem key={y} value={y.toString()}>
+                    {y}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>
 
           <div className="flex items-center space-x-4 w-full md:w-auto justify-between md:justify-end">
             <div className="flex items-center space-x-4">
-              <span className="text-white text-sm">Rating</span>
-              <div className="bg-gray-700 rounded-full p-2 border-2 border-gray-500">
-                <Slider
-                  value={[minRating]}
-                  onValueChange={(value) => {
-                    console.log("Slider value changed to:", value[0]);
-                    setMinRating(value[0]);
-                  }}
-                  max={10}
-                  step={0.5}
-                  className="w-32 md:w-48 [&_[role=slider]]:bg-red-600 [&_[role=slider]]:border-red-600 [&_.relative]:bg-white [&_.relative]:border-2 [&_.relative]:border-gray-400 [&_.absolute]:bg-red-600"
-                />
-              </div>
-              <span className="text-white text-sm">
-                {minRating.toFixed(1)}+{" "}
-              </span>
+              <span className="text-white text-sm">Min Rating</span>
+              <StarRating
+                rating={minRating === 0 ? null : Math.round(minRating / 2)}
+                onRatingChange={(starRating) => setMinRating(starRating * 2)}
+                disabled={false}
+              />
+              <Button
+                variant="outline"
+                onClick={() => setMinRating(0)}
+                className={`rounded-full px-3 py-1 text-sm ${
+                  minRating === 0
+                    ? "bg-red-600 hover:bg-red-700 text-white"
+                    : "bg-gray-800 text-gray-300 border-gray-600 hover:bg-gray-700"
+                }`}
+              >
+                All
+              </Button>
             </div>
 
             <Button

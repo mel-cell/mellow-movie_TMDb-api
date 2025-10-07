@@ -1,7 +1,7 @@
 import React, { useState, useEffect, Suspense, lazy } from "react";
 const Button = lazy(() => import("@/components/ui/button").then(mod => ({ default: mod.Button })));
 const Skeleton = lazy(() => import("@/components/ui/skeleton").then(mod => ({ default: mod.Skeleton })));
-import { X } from "lucide-react";
+const Input = lazy(() => import("@/components/ui/input").then(mod => ({ default: mod.Input })));
 import { tmdbService } from "@/lib/api/TMDbServices";
 import type { Movie, TVShow } from "@/lib/api/TMDbServices";
 import { useAuth } from "@/contexts/AuthContext";
@@ -14,6 +14,7 @@ const FavPage: React.FC = () => {
   const [favorites, setFavorites] = useState<FavoriteItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     const fetchFavorites = async () => {
@@ -51,23 +52,11 @@ const FavPage: React.FC = () => {
     fetchFavorites();
   }, [user, sessionId]);
 
-  const removeFavorite = async (item: FavoriteItem) => {
-    if (!user || !sessionId) return;
 
-    try {
-      await tmdbService.addFavorite(
-        user.id.toString(),
-        sessionId,
-        item.id,
-        item.mediaType,
-        false
-      );
-      setFavorites((prev) => prev.filter((fav) => fav.id !== item.id));
-    } catch (err) {
-      console.error("Error removing favorite:", err);
-      setError("Failed to remove favorite. Please try again.");
-    }
-  };
+  const filteredFavorites = favorites.filter((item) => {
+    const title = 'title' in item ? item.title : item.name;
+    return title.toLowerCase().includes(searchQuery.toLowerCase());
+  });
 
   if (loading) {
     return (
@@ -98,22 +87,24 @@ const FavPage: React.FC = () => {
     <div className="min-h-screen w-screen bg-black text-white p-4">
       <div className="max-w-7xl mx-auto mt-20">
         <h1 className="text-3xl font-bold mb-4">My Favorites</h1>
-        {favorites.length === 0 ? (
-          <p className="text-gray-400">You haven't added any favorites yet.</p>
+        <Suspense fallback={<div>Loading input...</div>}>
+          <Input
+            placeholder="Search favorites..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="max-w-md mb-4"
+          />
+        </Suspense>
+        {filteredFavorites.length === 0 ? (
+          <p className="text-gray-400">
+            {favorites.length === 0
+              ? "You haven't added any favorites yet."
+              : "No favorites match your search."}
+          </p>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-            {favorites.map((item) => (
-              <div key={item.id} className="relative group">
-                <MediaCard item={item} />
-                <Button
-                  variant="destructive"
-                  size="sm"
-                  className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
-                  onClick={() => removeFavorite(item as any)}
-                >
-                  <X className="w-4 h-4" />
-                </Button>
-              </div>
+            {filteredFavorites.map((item) => (
+              <MediaCard key={item.id} item={item} className="hover:scale-100" />
             ))}
           </div>
         )}

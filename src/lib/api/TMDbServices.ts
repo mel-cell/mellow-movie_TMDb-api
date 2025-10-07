@@ -492,6 +492,26 @@ class TMDbService {
     return data;
   }
 
+  async getMovieAccountStates(
+    movieId: number,
+    sessionId: string
+  ): Promise<{ id: number; favorite: boolean; rated: any; watchlist: boolean }> {
+    const data = await this.request(`/movie/${movieId}/account_states`, {
+      session_id: sessionId,
+    });
+    return data;
+  }
+
+  async getTVAccountStates(
+    tvId: number,
+    sessionId: string
+  ): Promise<{ id: number; favorite: boolean; rated: any; watchlist: boolean }> {
+    const data = await this.request(`/tv/${tvId}/account_states`, {
+      session_id: sessionId,
+    });
+    return data;
+  }
+
   // =================================================================
   // --- METODE TRANSAKSI (POST/DELETE) ---
   // =================================================================
@@ -720,3 +740,9 @@ export const getRatedTVShows = (
   sessionId: string,
   page: number = 1
 ) => tmdbService.getRatedTVShows(accountId, sessionId, page);
+
+export const getMovieAccountStates = (movieId: number, sessionId: string) =>
+  tmdbService.getMovieAccountStates(movieId, sessionId);
+
+export const getTVAccountStates = (tvId: number, sessionId: string) =>
+  tmdbService.getTVAccountStates(tvId, sessionId);
