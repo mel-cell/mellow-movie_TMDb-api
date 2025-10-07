@@ -9,7 +9,7 @@ import { tmdbService, addFavorite, addMovieRating, addTVRating, getSimilarMovies
 import type { MovieDetail, TVDetail, Video, Credit, Movie, TVShow } from '@/lib/api/TMDbServices';
 import { useAuth } from '@/contexts/AuthContext';
 import MediaCard from '@/components/MediaCard';
-
+ 
 const DetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const location = useLocation();

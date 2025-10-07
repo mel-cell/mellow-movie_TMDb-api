@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { supabase } from '../lib/supabase/supabaseClient';
-import { User } from '@supabase/supabase-js';
+import { User } from '/lib/@supabase/supabase-js';
 import { Button } from './ui/button';
 
 const Header: React.FC = () => {
   const [user, setUser] = useState<User | null>(null);
-
+  
   useEffect(() => {
     const getUser = async () => {
       const { data: { user } } = await supabase.auth.getUser();
@@ -30,7 +30,7 @@ const Header: React.FC = () => {
   return (
     <header className="bg-gray-900 text-white p-4">
       <div className="container mx-auto flex justify-between items-center">
-        <Link to="/" className="text-2xl font-bold">Mel Movie</Link>
+        <Link to="/" className="text-2xl font-bold">FlixWorld</Link>
         <nav className="flex space-x-4">
           <Link to="/" className="hover:text-gray-300">Home</Link>
           <Link to="/movie" className="hover:text-gray-300">Movies</Link>
