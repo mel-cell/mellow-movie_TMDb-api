@@ -3,18 +3,23 @@ import { tmdbService } from "@/lib/api/TMDbServices";
 import type { Movie, Video } from "@/lib/api/TMDbServices";
 import HeroSection from "@/components/HeroSection";
 
-// Lazy load components that are below the fold
+// Komponen di bawah dimuat secara lazy agar performa halaman lebih cepat
 const TrendingSection = lazy(() => import("@/components/TrendingSection"));
 const BrowseSection = lazy(() => import("@/components/BrowseSection"));
-const VideoPlayRecommended = lazy(() => import("@/components/videoPlayrecomended"));
+const VideoPlayRecommended = lazy(
+  () => import("@/components/videoPlayrecomended")
+);
 const ActorList = lazy(() => import("@/components/actorlist"));
 
 const HomePage: React.FC = () => {
+  // State utama
   const [heroMovie, setHeroMovie] = useState<Movie | null>(null);
   const [heroTrailer, setHeroTrailer] = useState<Video | null>(null);
-  const [theme, setTheme] = useState<"light" | "dark">("dark"); // default dark
 
-  // 🔹 Sync theme with document
+  // Tema (gelap / terang)
+  const [theme, setTheme] = useState<"light" | "dark">("dark");
+
+  // Cek tema saat pertama render
   useEffect(() => {
     if (document.documentElement.classList.contains("dark")) {
       setTheme("dark");
@@ -23,7 +28,7 @@ const HomePage: React.FC = () => {
     }
   }, []);
 
-  // 🔹 Apply theme changes
+  // Terapkan tema ke dokumen
   useEffect(() => {
     if (theme === "dark") {
       document.documentElement.classList.add("dark");
@@ -32,24 +37,33 @@ const HomePage: React.FC = () => {
     }
   }, [theme]);
 
+  // Ambil tema tersimpan di localStorage
   useEffect(() => {
     const savedTheme = localStorage.getItem("theme") as "dark" | "light" | null;
     if (savedTheme) setTheme(savedTheme);
   }, []);
 
+  // ==============================================================
+  // Ambil data film trending + trailer
+  // ==============================================================
 
-  // fetch hero movie and trailer data only initially
+  const [trendingMovies, setTrendingMovies] = useState<Movie[]>([]);
+  const [currentIndex, setCurrentIndex] = useState(0);
+
   useEffect(() => {
     const fetchHeroData = async () => {
       try {
         const trendingMovieData = await tmdbService.getTrending("movie", "day");
 
         if (trendingMovieData.results.length > 0) {
-          const randomMovie = trendingMovieData.results[
-            Math.floor(Math.random() * trendingMovieData.results.length)
-          ] as Movie;
+          const movies = trendingMovieData.results as Movie[];
+          setTrendingMovies(movies);
+
+          // Pilih film acak untuk ditampilkan pertama kali
+          const randomMovie = movies[Math.floor(Math.random() * movies.length)];
           setHeroMovie(randomMovie);
 
+          // Ambil trailer film pertama
           const videos = await tmdbService.getMovieVideos(randomMovie.id);
           setHeroTrailer(videos[0] || null);
         }
@@ -60,60 +74,97 @@ const HomePage: React.FC = () => {
     fetchHeroData();
   }, []);
 
-  // lazy load other data after initial render
+  // ==============================================================
+  // 🔁 Ganti trailer otomatis tiap 15 detik
+  // ==============================================================
+  useEffect(() => {
+    if (trendingMovies.length === 0) return;
+
+    const interval = setInterval(async () => {
+      const nextIndex = (currentIndex + 1) % trendingMovies.length;
+      setCurrentIndex(nextIndex);
+
+      const nextMovie = trendingMovies[nextIndex];
+      setHeroMovie(nextMovie);
+
+      const videos = await tmdbService.getMovieVideos(nextMovie.id);
+      setHeroTrailer(videos[0] || null);
+    }, 15000); // setiap 15 detik
+
+    return () => clearInterval(interval);
+  }, [currentIndex, trendingMovies]);
+
+  // ==============================================================
+  // 🔹 Lazy load tambahan (dipanggil setelah 3 detik)
+  // ==============================================================
   useEffect(() => {
     const lazyLoadData = async () => {
-      // You can implement lazy data fetching here for TrendingSection, BrowseSection, etc.
-      // For example, you can trigger events or state updates to fetch data inside those components lazily
+      // Bisa dipakai untuk load data tambahan nanti
     };
 
-    // Delay lazy loading to after initial render
     const timer = setTimeout(() => {
       lazyLoadData();
-    }, 3000); // 3 seconds delay, adjust as needed
+    }, 3000); // delay 3 detik
 
     return () => clearTimeout(timer);
   }, []);
 
-  // apply theme
-
+  // ==============================================================
+  // 🔹 Tampilan halaman
+  // ==============================================================
   return (
     <div className="min-h-screen bg-black text-white">
-      <HeroSection
-        heroMovie={heroMovie}
-        heroTrailer={heroTrailer}
-      />
+      {/* Bagian Hero */}
+      <HeroSection heroMovie={heroMovie} heroTrailer={heroTrailer} />
 
-      {/* Trending Section */}
-      <div className="max-w-screen-2xl mx-auto p-5">
-        <Suspense fallback={<div className="h-64 bg-gray-800 animate-pulse rounded"></div>}>
-          <TrendingSection />
-        </Suspense>
-      </div>
-
-      {/* Browse Section */}
-      <div className="max-w-screen-2xl mx-auto p-5">
-        <Suspense fallback={<div className="h-64 bg-gray-800 animate-pulse rounded"></div>}>
-          <BrowseSection />
-        </Suspense>
-      </div>
-
-      {/* Video Recommended */}
-      <div className="max-w-screen-2xl mx-auto p-5">
-        {heroMovie && (
-          <Suspense fallback={<div className="h-64 bg-gray-800 animate-pulse rounded"></div>}>
-            <VideoPlayRecommended movieId={heroMovie.id} />
+      {/* Bagian Trending */}
+      <div className="max-w-7xl mx-auto">
+        <div className="max-w-screen p-5">
+          <Suspense
+            fallback={
+              <div className="h-64 bg-gray-800 animate-pulse rounded"></div>
+            }
+          >
+            <TrendingSection />
           </Suspense>
-        )}
-      </div>
+        </div>
 
-      {/* Actor List */}
-      <div className="max-w-screen-2xl mx-auto p-5">
-        {heroMovie && (
-          <Suspense fallback={<div className="h-64 bg-gray-800 animate-pulse rounded"></div>}>
-            <ActorList movieId={heroMovie.id} />
+        {/* Bagian Browse */}
+        <div className="max-w-screen-2xl mx-auto p-5">
+          <Suspense
+            fallback={
+              <div className="h-64 bg-gray-800 animate-pulse rounded"></div>
+            }
+          >
+            <BrowseSection />
           </Suspense>
-        )}
+        </div>
+
+        {/* Bagian Video Recommended */}
+        <div className="max-w-screen-2xl mx-auto p-5">
+          {heroMovie && (
+            <Suspense
+              fallback={
+                <div className="h-64 bg-gray-800 animate-pulse rounded"></div>
+              }
+            >
+              <VideoPlayRecommended movieId={heroMovie.id} />
+            </Suspense>
+          )}
+        </div>
+
+        {/* Bagian Actor List */}
+        <div className="max-w-screen-2xl mx-auto p-5">
+          {heroMovie && (
+            <Suspense
+              fallback={
+                <div className="h-64 bg-gray-800 animate-pulse rounded"></div>
+              }
+            >
+              <ActorList movieId={heroMovie.id} />
+            </Suspense>
+          )}
+        </div>
       </div>
     </div>
   );

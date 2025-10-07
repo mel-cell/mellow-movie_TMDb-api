@@ -170,22 +170,22 @@ const BrowseSection: React.FC<BrowseSectionProps> = () => {
           }}
           className="mb-6"
         >
-          <TabsList className="grid w-full grid-cols-3 bg-white">
+          <TabsList className="grid w-full grid-cols-3 bg-black border border-gray-700 rounded-lg">
             <TabsTrigger
               value="movie"
-              className="text-black data-[state=active]:text-white data-[state=active]:bg-red-600"
+              className="text-white data-[state=active]:text-white data-[state=active]:bg-red-600"
             >
               Movies
             </TabsTrigger>
             <TabsTrigger
               value="tv"
-              className="text-black data-[state=active]:text-white data-[state=active]:bg-red-600"
+              className="text-white data-[state=active]:text-white data-[state=active]:bg-red-600"
             >
               TV Shows
             </TabsTrigger>
             <TabsTrigger
               value="original"
-              className="text-black data-[state=active]:text-white data-[state=active]:bg-red-600"
+              className="text-white data-[state=active]:text-white data-[state=active]:bg-red-600"
             >
               Original Series
             </TabsTrigger>

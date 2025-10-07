@@ -16,25 +16,64 @@ const HeroSection: React.FC<HeroSectionProps> = ({
 }) => {
   const { t } = useTranslation();
 
-  // ✅ Tambahan state untuk mute/unmute
   const [isMuted, setIsMuted] = useState(true);
-
-  // ✅ Ref iframe untuk kontrol mute
+  const [runtime, setRuntime] = useState<string>(""); // ✅ state untuk durasi tayang
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
-  // ✅ Fungsi toggle mute
   const toggleMute = () => {
     setIsMuted((prev) => !prev);
   };
 
-  // ✅ Effect untuk mengupdate iframe src agar mute sesuai state
+  // ✅ Ambil runtime film dari TMDb API berdasarkan heroMovie.id
+  useEffect(() => {
+    const fetchRuntime = async () => {
+      if (!heroMovie) return;
+
+      const isMovie = "title" in heroMovie;
+      const type = isMovie ? "movie" : "tv";
+      const apiKey = import.meta.env.VITE_TMDB_API_KEY;
+
+      try {
+        const res = await fetch(
+          `https://api.themoviedb.org/3/${type}/${heroMovie.id}?api_key=${apiKey}&language=en-US`
+        );
+        const data = await res.json();
+
+        // Movie: pakai data.runtime
+        // TV: pakai data.episode_run_time (array)
+        let minutes = 0;
+        if (isMovie && data.runtime) {
+          minutes = data.runtime;
+        } else if (!isMovie && data.episode_run_time?.length > 0) {
+          minutes = data.episode_run_time[0];
+        }
+
+        if (minutes > 0) {
+          const hours = Math.floor(minutes / 60);
+          const mins = minutes % 60;
+          setRuntime(hours > 0 ? `${hours}h ${mins}m` : `${mins}m`);
+        } else {
+          setRuntime("N/A");
+        }
+      } catch (error) {
+        console.error("Gagal mengambil runtime:", error);
+        setRuntime("N/A");
+      }
+    };
+
+    fetchRuntime();
+  }, [heroMovie]);
+
+  // ✅ Update mute/unmute pada iframe
   useEffect(() => {
     if (iframeRef.current && heroTrailer) {
       const src = `https://www.youtube.com/embed/${
         heroTrailer.key
       }?autoplay=1&mute=${isMuted ? 1 : 0}&controls=0&loop=1&playlist=${
         heroTrailer.key
-      }&modestbranding=1&rel=0&playsinline=1&enablejsapi=1&origin=${window.location.origin}`;
+      }&modestbranding=1&rel=0&playsinline=1&enablejsapi=1&origin=${
+        window.location.origin
+      }`;
       iframeRef.current.src = src;
     }
   }, [isMuted, heroTrailer]);
@@ -51,11 +90,11 @@ const HeroSection: React.FC<HeroSectionProps> = ({
 
   return (
     <section className="relative h-screen w-screen bg-black overflow-hidden">
-      {/* Autoplay trailer background - Cropped to remove gaps */}
+      {/* Trailer Background */}
       {heroTrailer && (
         <div className="absolute inset-0 overflow-hidden">
           <iframe
-            ref={iframeRef} // attach ref
+            ref={iframeRef}
             id="hero-video-player"
             className="absolute inset-0 w-[130%] h-[130%] object-cover -top-[65px] -left-[32.5px] scale-[1.15] transform"
             src={`https://www.youtube.com/embed/${heroTrailer.key}?autoplay=1&mute=1&controls=0&playlist=${heroTrailer.key}&modestbranding=1&rel=0`}
@@ -85,10 +124,10 @@ const HeroSection: React.FC<HeroSectionProps> = ({
         />
       )}
 
-      {/* Gradient Overlay */}
+      {/* Overlay */}
       <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-transparent" />
 
-      {/* Main content - Left aligned */}
+      {/* Main content */}
       <div className="relative flex items-center h-full pt-20 pl-12">
         <div className="text-left text-white max-w-4xl animate-fade-in">
           <h1 className="text-6xl font-bold mb-4">{title}</h1>
@@ -103,8 +142,8 @@ const HeroSection: React.FC<HeroSectionProps> = ({
                 {rating}%
               </span>
               <span>•</span>
-              <span>{t('hero.duration')}</span>{" "}
-              {/* Placeholder; fetch runtime from TMDb if needed */}
+              {/* ✅ durasi tayang asli */}
+              <span>{runtime || "Loading..."}</span>
             </div>
           )}
 
@@ -120,7 +159,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({
                   className="bg-red-600 hover:bg-red-700 text-white text-lg px-12 py-3 rounded-full font-semibold shadow-lg"
                 >
                   <Play className="mr-2 h-5 w-5" />
-                  {t('hero.play')}
+                  {t("hero.play")}
                 </Button>
               </DialogTrigger>
               <DialogContent className="max-w-xl h-[80vh] p-0">
@@ -140,13 +179,12 @@ const HeroSection: React.FC<HeroSectionProps> = ({
               className="text-white bg-transparent text-lg px-8 py-3 rounded-full font-semibold hover:bg-black hover:bg-opacity-10"
             >
               <Plus className="mr-2 h-5 w-5" />
-              {t('hero.myList')}
+              {t("hero.myList")}
             </Button>
           </div>
         </div>
       </div>
 
-      {/* gradient transisi transparant*/}
       <div className="absolute bottom-0 left-0 right-0 p-8 h-[20%] bg-gradient-to-b from-transparent via-black/80 to-black"></div>
     </section>
   );
