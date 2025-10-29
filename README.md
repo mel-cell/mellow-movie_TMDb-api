@@ -1,73 +1,81 @@
-# React + TypeScript + Vite
+# Mellow - Movie & TV Show Explorer
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Mellow is a modern, responsive web application built with React and TypeScript for discovering and managing movies and TV shows. It integrates with The Movie Database (TMDb) API to provide detailed information, trailers, cast details, and user-specific features like favorites and ratings. The app supports multiple languages (English and Indonesian), dark theme, and user authentication.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **Browse Movies & TV Shows**: Explore popular, trending, and genre-filtered content with pagination.
+- **Detailed Views**: Access movie/TV show details, trailers, cast, and similar recommendations.
+- **Search & Discover**: Search across movies, TV shows, and collections; discover by genre, year, or ratings.
+- **User Authentication**: Login via TMDb to access personalized features.
+- **Favorites & Ratings**: Add/remove favorites and rate movies/TV shows.
+- **Responsive UI**: Optimized for desktop and mobile with a sleek dark theme.
+- **Internationalization**: Support for English and Indonesian languages.
+- **Lazy Loading**: Optimized performance with lazy-loaded components.
 
-## React Compiler
+## Tech Stack
 
-The React Compiler is currently not compatible with SWC. See [this issue](https://github.com/vitejs/vite-plugin-react/issues/428) for tracking the progress.
+- **Frontend**: React 19, TypeScript, Vite
+- **Styling**: Tailwind CSS, Radix UI components
+- **Routing**: React Router DOM
+- **API**: TMDb API (via Axios)
+- **State Management**: React Context (for auth)
+- **Internationalization**: react-i18next
+- **Icons**: Lucide React
+- **Build Tools**: Vite, ESLint, PostCSS
+- **Deployment**: Vercel-ready
 
-## Expanding the ESLint configuration
+## Installation
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+1. **Clone the repository**:
+   ```bash
+   git clone https://github.com/your-username/mellow-movie_TMDb-api.git
+   cd mellow-movie_TMDb-api
+   ```
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+2. **Install dependencies**:
+   ```bash
+   npm install
+   ```
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+3. **Set up environment variables**:
+   - Copy `.env.example` to `.env.local`.
+   - Add your TMDb API key: `VITE_TMDB_API_KEY=your_api_key_here`.
+   - Obtain an API key from [TMDb](https://www.themoviedb.org/settings/api).
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+4. **Run the development server**:
+   ```bash
+   npm run dev
+   ```
+   Open [http://localhost:5173](http://localhost:5173) in your browser.
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+5. **Build for production**:
+   ```bash
+   npm run build
+   npm run preview
+   ```
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## Usage
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+- **Home Page (/)**: View trending movies with hero trailers, browse sections, and actor lists.
+- **Movies (/movie)**: Browse popular movies, filter by genre, and paginate.
+- **TV Shows (/tv)**: Browse popular TV shows, filter by genre, and paginate.
+- **Details (/movie/:id or /tv/:id)**: View detailed info, trailers, cast, and similar content.
+- **Actors (/actors)**: Explore trending actors.
+- **Profile (/profile)**: Manage your account (requires login).
+- **Favorites (/favorites)**: View your favorite movies and TV shows (requires login).
+- **Login (/login)**: Authenticate with TMDb credentials.
+
+## Contributors
+
+This project was developed by a dedicated team with the following roles and responsibilities:
+
+- **Maulidani Brian Melvino**: Fullstack developer responsible for overall architecture, API integration, and UI components.
+- **Reifan Hanafi**: Backend developer focusing on TV show API endpoints and related UI features.
+- **Tito Tegar**: Backend developer handling movie API endpoints and associated UI elements.
+- **Citra**: Frontend developer creating basic UI layouts and reusable components.
+- **Naviz**: QA engineer managing component quality assurance, with a focus on Keil components and actors UI.
+
+## License
+
+This project is licensed under the MIT License. See the LICENSE file for details.
