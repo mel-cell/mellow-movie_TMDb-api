@@ -1,5 +1,8 @@
 # Mellow - Movie & TV Show Explorer
 
+<img src="image.png" width="100%">
+
+
 Mellow is a modern, responsive web application built with React and TypeScript for discovering and managing movies and TV shows. It integrates with The Movie Database (TMDb) API to provide detailed information, trailers, cast details, and user-specific features like favorites and ratings. The app supports multiple languages (English and Indonesian), dark theme, and user authentication.
 
 ## Features
