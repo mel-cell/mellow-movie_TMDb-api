@@ -82,3 +82,5 @@ This project was developed by a dedicated team with the following roles and resp
 ## License
 
 This project is licensed under the MIT License. See the LICENSE file for details.
+
+I HEART NATASYA ❤️
